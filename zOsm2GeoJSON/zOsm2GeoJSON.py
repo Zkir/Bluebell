@@ -1,0 +1,226 @@
+﻿import time
+import subprocess
+import sys
+
+from mdlOsmParser import readOsmXml, encodeXmlString
+from osmGeometry import clsOsmGeometry
+from mdlXmlParser import clsXMLparser
+
+def escapeJsonString(s):
+    s = s.replace("\"","" )
+    s = s.replace("'","")
+    s = s.replace("\\","\\\\") # single \ to double \\
+    return s
+
+def writeGeoJson(Objects, objOsmGeom, strOutputFile, strAction, allowed_tags):
+    
+    fo = open(strOutputFile, 'w', encoding="utf-8")
+    fo.write('{ \n') 
+    fo.write('    "type": "FeatureCollection",\n')
+    fo.write('    "features": [\n')
+
+    j=0
+    for osmObject in Objects:
+        if j!=0:
+            fo.write(',\n')
+        j=j+1  
+        fo.write('        { \n') 
+        fo.write('            "type": "Feature",\n')
+        fo.write('            "properties": { \n') 
+        fo.write('                "@id": "osm/'+osmObject.type +"/"+osmObject.id +'",\n')
+
+        i=0
+        for tag in osmObject.osmtags:
+            
+            if tag in allowed_tags:
+                if i!=0:
+                    fo.write(',\n')
+                i=i+1
+                key = tag
+                value = osmObject.getTag(tag)  
+                fo.write('                "'+escapeJsonString(key)+'": "'+ escapeJsonString(value) +'"')
+        fo.write('\n')
+        fo.write('            },\n') 
+        if strAction == "write_poi":
+            centroid_lon = (osmObject.bbox.minLon + osmObject.bbox.maxLon )/2
+            centroid_lat = (osmObject.bbox.minLat + osmObject.bbox.maxLat )/2
+
+            fo.write('            "geometry": {\n')
+            fo.write('                "type": "Point",\n')
+            fo.write('                "coordinates": [\n')
+            fo.write('                    '+str(centroid_lon)+',\n')
+            fo.write('                    '+str(centroid_lat)+'\n')
+            fo.write('                ]\n')
+            fo.write('            }\n')
+
+        if (strAction == "write_lines") :
+            if osmObject.type == 'way':
+                fo.write('            "geometry": {\n')
+                fo.write('                "type": "LineString",\n')
+                fo.write('                "coordinates": [\n')              
+                i=0
+                for noderef in osmObject.NodeRefs:
+                    if i!=0:
+                        fo.write(',\n')
+                    i=i+1  
+                    fo.write('                    [' + str(objOsmGeom.GetNodeLon(noderef)) + ', ' + str(objOsmGeom.GetNodeLat(noderef)) + ']')
+                fo.write('\n')
+                fo.write('                ]\n')
+                fo.write('            }\n')
+
+            else:
+               print ("Object " + osmObject.id + " skipped: only ways are supported for action write_lines")
+
+        if (strAction == "write_poly"):
+            if osmObject.type == 'way':
+                fo.write('            "geometry": {\n')
+                fo.write('                "type": "Polygon",\n')
+                fo.write('                "coordinates": [\n')              
+                i=0
+                fo.write('                    [\n')                 
+                for noderef in osmObject.NodeRefs:
+                    if i!=0:
+                        fo.write(',\n')
+                    i=i+1 
+                    fo.write('                        [' + str(objOsmGeom.GetNodeLon(noderef)) + ', ' + str(objOsmGeom.GetNodeLat(noderef)) + ']')
+                fo.write('\n')
+                fo.write('                    ]\n')
+                fo.write('                ]\n')
+                fo.write('            }\n')
+
+            else:
+                Outlines=objOsmGeom.ExtractCloseNodeChainFromRelation(osmObject.WayRefs)
+                fo.write('            "geometry": {\n')
+                fo.write('                "type": "Polygon",\n')
+                fo.write('                "coordinates": [\n') 
+                   
+                for i in range(len(Outlines)):
+                    if i!=0:
+                            fo.write(',\n')
+                    fo.write('                    [\n') 
+                    for k in range(len(Outlines[i])):
+                        if k!=0:
+                            fo.write(',\n')
+                        fo.write('                        [' + str(objOsmGeom.nodes[Outlines[i][k]].lon) + ', ' + str(objOsmGeom.nodes[Outlines[i][k]].lat) + ']')                    
+                    fo.write('\n')
+                    fo.write('                    ]')
+                fo.write('\n')
+                fo.write('                ]\n')
+                fo.write('            }\n')
+               
+
+
+
+        fo.write('        }') 
+
+    fo.write('\n')
+    fo.write('    ]\n') 
+    fo.write('}\n') 
+    fo.close()
+    print ("Completed: "+str(j)+" objects written")
+
+
+# lets's filter out something, we are interested only in particular objects
+def filterObjects(Objects, strFilter, strAction):
+    SelectedObjects = []
+    for osmObject in Objects:
+        #print (str(osmObject.type)+str(osmObject.id))    
+        #filter out objects without tabs. they cannot make any "features"
+        blnFilter = len(osmObject.osmtags)>0 
+
+        #funny enough, filter depends on action too
+        if (strAction == "write_lines") or (strAction == "write_poly"):
+
+            #if target object type is line or polygon, nodes cannot be used.
+            blnFilter = blnFilter and (osmObject.type !="node")
+
+        if  (strAction == "write_poly"):
+            if (osmObject.type =="way") :
+                blnFilter = blnFilter and (osmObject.NodeRefs[0] == osmObject.NodeRefs[-1])
+
+
+        if blnFilter:
+            SelectedObjects.append(osmObject)
+ 
+    return SelectedObjects
+
+def writeTagStatistics(strOutputFileName, Objects):
+    tags_stat = {}
+    tags_stat_filtered = {}
+    for osmObject in Objects:
+       for tag in osmObject.osmtags:
+           if tag in tags_stat:
+               tags_stat[tag] = tags_stat[tag] + 1
+           else:
+               tags_stat[tag] = 1 
+    if (len(tags_stat)>0):
+        #сортировка
+        sorted_values = sorted(tags_stat.values(), reverse = True) #Сортировка словаря Python по значению
+        tags_stat_sorted = {}
+        for i in sorted_values:
+            for k in tags_stat.keys():
+                if tags_stat[k] == i:
+                    tags_stat_sorted[k] = tags_stat[k]
+                    break
+        #вывод 
+        fo = open(strOutputFileName, 'w', encoding="utf-8")
+        fo.write(str(len(tags_stat_sorted)) + " different tags totally \n" )
+        max_tag = list(tags_stat_sorted.keys())[0]
+        max_count=tags_stat_sorted[max_tag]
+        i=0
+        for tag in tags_stat_sorted.keys():
+            i = i + 1
+            fo.write(str(i)+'.  '+tag + ': ' + str(tags_stat_sorted[tag]) +'      (' +  "{:.1f}".format(tags_stat_sorted[tag]/max_count*100)   + ' %)\n' )
+
+        #Фильтрация 1% персентиль 
+        for tag in tags_stat_sorted.keys():
+            if tags_stat[tag]/max_count >0.01:
+                tags_stat_filtered[tag] = tags_stat_sorted[tag]
+               
+        print ("1% tag filtering applied. " + str(len(tags_stat_filtered)) + " different tags retained out of " + str(len(tags_stat_sorted)) )
+        fo.write("1% tag filtering applied. " + str(len(tags_stat_filtered)) + " different tags retained out of " + str(len(tags_stat_sorted)) )
+        fo.close()
+    else: 
+        print ("WARNING: no objects or no tags")
+    return tags_stat_filtered
+
+    
+def createJson(strInputOsmFile, strOutputFileName,strAction):
+    print("input file: "+ strInputOsmFile)
+    print("target file: "+ strOutputFileName)
+    print ("action: " + strAction)
+
+    t1 = time.time()
+
+    objOsmGeom, Objects = readOsmXml(strInputOsmFile)
+    SelectedObjects = filterObjects(Objects,"does not really matter, hardcoded for now", strAction)
+
+    allowed_tags = writeTagStatistics(strOutputFileName+'.stat.txt',SelectedObjects)
+    writeGeoJson(SelectedObjects, objOsmGeom, strOutputFileName, strAction, allowed_tags)  #see former   processBuildings()
+
+
+    t2 = time.time()
+    print("File " + strInputOsmFile + " processed in "+str(t2-t1)+" seconds")
+
+def main():
+    
+    if len(sys.argv)>1:
+        strInputFileName = sys.argv[1]
+        strOutputFileName = sys.argv[2]
+        strAction = sys.argv[3]
+        if strAction == "--action=write_lines":
+            strAction="write_lines"
+        elif strAction == "--action=write_poly":
+            strAction="write_poly"
+        elif strAction == "--action=write_poi":
+            strAction="write_poi"
+        else:
+            raise Exception('Unknown action type: '+strAction+'  Availble actions are "write_poi", "write_lines", "write_poly"')
+
+        createJson(strInputFileName, strOutputFileName,strAction)
+        print('Thats all, folks!')
+    else:
+        print ('usage: zOsm2JSON input.osm [output.json]')
+
+
+main()

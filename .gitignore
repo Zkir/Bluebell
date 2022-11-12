@@ -1,0 +1,16 @@
+__pycache__/*.*
+00_Planet/planet-221031.osm.pbf.fdmdownload
+01_Countries/*.pbf
+01_Countries/*.o5m
+02_Interim_osm/*.osm
+99_Output/*.osm
+99_Output/*.json
+99_Output/*.shp
+99_Output/*.dbf
+99_Output/*.shx
+99_Output/*.prj
+99_Output/*.stat.txt
+
+zOsm2GeoJSON/__pycache__/*.*
+
+
