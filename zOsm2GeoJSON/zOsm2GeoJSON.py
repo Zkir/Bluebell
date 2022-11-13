@@ -11,6 +11,17 @@ def escapeJsonString(s):
     s = s.replace("'","")
     s = s.replace("\\","\\\\") # single \ to double \\
     return s
+    
+#most uncertain part, we need to create parcer for osmfilter filter!     
+def evaluateFilter(strFilter, osmtags):
+    #print(strFilter + '\n') 
+    blnResult = True
+    #if strFilter.find("admin_level=2")!=-1: 
+    #    blnResult =  (blnResult and (osmtags.get("admin_level",'')=="2" ))
+    #    
+    #if strFilter.find("admin_level=4")!=-1: 
+    #    blnResult =  (blnResult and (osmtags.get("admin_level",'')=="4" ))    
+    return blnResult
 
 def writeGeoJson(Objects, objOsmGeom, strOutputFile, strAction, allowed_tags):
     
@@ -127,7 +138,7 @@ def filterObjects(Objects, strFilter, strAction):
         #print (str(osmObject.type)+str(osmObject.id))    
         #filter out objects without tabs. they cannot make any "features"
         blnFilter = len(osmObject.osmtags)>0 
-
+        blnFilter = blnFilter and evaluateFilter(strFilter, osmObject.osmtags )
         #funny enough, filter depends on action too
         if (strAction == "write_lines") or (strAction == "write_poly"):
 
@@ -153,49 +164,60 @@ def writeTagStatistics(strOutputFileName, Objects):
                tags_stat[tag] = tags_stat[tag] + 1
            else:
                tags_stat[tag] = 1 
+               
+    
     if (len(tags_stat)>0):
         #сортировка
-        sorted_values = sorted(tags_stat.values(), reverse = True) #Сортировка словаря Python по значению
-        tags_stat_sorted = {}
-        for i in sorted_values:
-            for k in tags_stat.keys():
-                if tags_stat[k] == i:
-                    tags_stat_sorted[k] = tags_stat[k]
-                    break
-        #вывод 
-        fo = open(strOutputFileName, 'w', encoding="utf-8")
-        fo.write(str(len(tags_stat_sorted)) + " different tags totally \n" )
+        tag_stat_sorted_as_list = sorted(tags_stat.items(), key=lambda item: item[1],reverse = True) #Сортировка словаря Python по значению
+        
+        tags_stat_sorted=dict(tag_stat_sorted_as_list)
+        
         max_tag = list(tags_stat_sorted.keys())[0]
-        max_count=tags_stat_sorted[max_tag]
-        i=0
-        for tag in tags_stat_sorted.keys():
-            i = i + 1
-            fo.write(str(i)+'.  '+tag + ': ' + str(tags_stat_sorted[tag]) +'      (' +  "{:.1f}".format(tags_stat_sorted[tag]/max_count*100)   + ' %)\n' )
-
+        max_count=tags_stat_sorted[max_tag] 
+        
         #Фильтрация 1% персентиль 
         for tag in tags_stat_sorted.keys():
             if tags_stat[tag]/max_count >0.01:
                 tags_stat_filtered[tag] = tags_stat_sorted[tag]
-               
-        print ("1% tag filtering applied. " + str(len(tags_stat_filtered)) + " different tags retained out of " + str(len(tags_stat_sorted)) )
-        fo.write("1% tag filtering applied. " + str(len(tags_stat_filtered)) + " different tags retained out of " + str(len(tags_stat_sorted)) )
+        
+        #вывод 
+        fo = open(strOutputFileName, 'w', encoding="utf-8")
+        fo.write(str(len(tags_stat_sorted)) + " different tags totally \n" ) 
+        
+        print   ("1% tag filtering applied. " + str(len(tags_stat_filtered)) + " different tags retained out of " + str(len(tags_stat_sorted)))
+        fo.write("1% tag filtering applied. " + str(len(tags_stat_filtered)) + " different tags retained out of " + str(len(tags_stat_sorted)) +'\n\n')
+       
+        i=0
+        blnSeparatorPrinted = False 
+        for tag in tags_stat_sorted.keys():
+            i = i + 1
+          
+            fo.write('{:4d}.'.format(i)+' '+'{:25s}'.format(tag) + ': ' + '{:10s}'.format(str(tags_stat_sorted[tag])) +'      (' +  "{:.1f}".format(tags_stat_sorted[tag]/max_count*100)   + ' %)\n' )
+            if (tags_stat[tag]/max_count < 0.01) and (not blnSeparatorPrinted) :
+                fo.write ('-------------------------------------------------------------- \n')
+                blnSeparatorPrinted = True 
+
+                       
+
         fo.close()
     else: 
         print ("WARNING: no objects or no tags")
     return tags_stat_filtered
 
     
-def createJson(strInputOsmFile, strOutputFileName,strAction):
+def createJson(strInputOsmFile, strOutputFileName,strAction,strFilter):
     print("input file: "+ strInputOsmFile)
     print("target file: "+ strOutputFileName)
     print ("action: " + strAction)
+    print ("filter: " + strFilter)
 
     t1 = time.time()
 
     objOsmGeom, Objects = readOsmXml(strInputOsmFile)
-    SelectedObjects = filterObjects(Objects,"does not really matter, hardcoded for now", strAction)
+    SelectedObjects = filterObjects(Objects, strFilter, strAction)
 
     allowed_tags = writeTagStatistics(strOutputFileName+'.stat.txt',SelectedObjects)
+    
     writeGeoJson(SelectedObjects, objOsmGeom, strOutputFileName, strAction, allowed_tags)  #see former   processBuildings()
 
 
@@ -217,7 +239,11 @@ def main():
         else:
             raise Exception('Unknown action type: '+strAction+'  Availble actions are "write_poi", "write_lines", "write_poly"')
 
-        createJson(strInputFileName, strOutputFileName,strAction)
+        strFilter=""
+        for i in range(4, len(sys.argv)) :       
+            strFilter = strFilter + ' ' + sys.argv[i]
+            
+        createJson(strInputFileName, strOutputFileName, strAction, strFilter)
         print('Thats all, folks!')
     else:
         print ('usage: zOsm2JSON input.osm [output.json]')
