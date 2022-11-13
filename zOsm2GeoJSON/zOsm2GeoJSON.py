@@ -191,12 +191,11 @@ def writeTagStatistics(strOutputFileName, Objects):
         blnSeparatorPrinted = False 
         for tag in tags_stat_sorted.keys():
             i = i + 1
-          
-            fo.write('{:4d}.'.format(i)+' '+'{:25s}'.format(tag) + ': ' + '{:10s}'.format(str(tags_stat_sorted[tag])) +'      (' +  "{:.1f}".format(tags_stat_sorted[tag]/max_count*100)   + ' %)\n' )
             if (tags_stat[tag]/max_count < 0.01) and (not blnSeparatorPrinted) :
                 fo.write ('-------------------------------------------------------------- \n')
                 blnSeparatorPrinted = True 
-
+                
+            fo.write('{:4d}.'.format(i)+' '+'{:25s}'.format(tag) + ': ' + '{:10s}'.format(str(tags_stat_sorted[tag])) +'      (' +  "{:.1f}".format(tags_stat_sorted[tag]/max_count*100)   + ' %)\n' )
                        
 
         fo.close()
