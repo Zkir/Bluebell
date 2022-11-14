@@ -8,7 +8,10 @@ GRAMMAR = [
     ['COMPLEX_EXPRESSION', ['NOT', 'COMPLEX_EXPRESSION']],
     ['COMPLEX_EXPRESSION', ['OBRACKET', 'COMPLEX_EXPRESSION', 'CBRACKET']],
     ['COMPLEX_EXPRESSION', ['SIMPLE_EXPRESSION']],
-    ['SIMPLE_EXPRESSION', ['tag=value']],
+    ['SIMPLE_EXPRESSION', ['TAG', 'EQ', 'VALUE']],
+    ['TAG', ['tag']],
+    ['VALUE', ['value']],
+    ['EQ', ['=']],
     ['OR', ['or']],
     ['AND', ['and']],
     ['NOT', ['not']],
@@ -16,30 +19,35 @@ GRAMMAR = [
     ['CBRACKET', [')']]
 ]
 
-# s="( landuse=harbour ) or ( industrial=port )"
-# s="amenity=atm or ( amenity=bank and atm=yes )"
-s = "( tag=value or tag=value ) and tag=value"
 
-# 1. remove redundant spaces
-s = s.strip()
-s = s + ' '
+#1. TOKENIZE. Initial string is separated into the list of tokens.
+def tokenize(s):
+    tokens = []
+    # 1. remove redundant spaces
+    s = s.strip()
+    s = s + ' '
 
-# 2. tokenize
-tokens = []
-k = 0
-for i in range(len(s)):
-    if s[i] == " ":
-        tokens.append(s[k:i].strip())
-        k = i
+    # 2. separate into tokens
+    k = 0
+    for i in range(len(s)):
+        if s[i] == " ":
+            token = s[k:i]
+            if token != '':  # no need to add empty token
+                tokens.append(token)
+            k = i + 1
 
-print(tokens)
-print('---')
-# produce
-A = [["S", ], ]  # initial rule
-for variant in A:
-    print(variant)
+        if s[i] == "=":
+            token = s[k:i]
+            if token != '':  # no need to add empty token
+                tokens.append(token)
+            tokens.append('=')
+            k = i + 1
+    return tokens
 
-for ii in range(1000):
+
+#2. APPLY RULES.
+#For each variant in the variant list we expand non-terminal lexeme to receive a new variant set.
+def apply_grammar(A, GRAMMAR):
     blnAnyVariantTransformed = False
     B = []
     for variant in A:
@@ -68,19 +76,18 @@ for ii in range(1000):
         if not blnVariantMatched:
             B.append(deepcopy(variant))  # Just copy variant if it was not transformed. it will be removed later.
 
-    print()
-    print('---')
-    print('step ' + str(ii))
+    return B, blnAnyVariantTransformed
 
-    A = deepcopy(B)
-    print(str(len(A)) + ' variants before elimination')
+
+#3. ELIMINATE
+# variants, even partially expanded, are eliminated if they do not match string to be parsed
+# obviously, only expanded lexemes are compared
+def eliminate_non_matching_variants (A, tokens):
     B = []
-    # eliminate non matched variants
-
     for variant in A:
         blnAcceptVariant = True
         if len(variant) > len(tokens):
-            # print("variant too long!")
+            # There are more lexems in variant than in parsed string. Variant is too long!
             blnAcceptVariant = False
 
         for i in range(len(tokens)):
@@ -89,8 +96,8 @@ for ii in range(1000):
                     # print('token matched! ' + tokens[i])
                     pass
                 else:
-                    if variant[i][0].isupper():  # it's non-terminal lexem, it cannot be tested
-                        break  # just skip variant, maybe it's correct after all lexem expanded
+                    if variant[i][0].isupper():  # it's non-terminal lexeme, it cannot be tested
+                        break  # just skip variant, maybe it's correct after all lexemes expanded
                     else:
                         # print('token NOT matched! ' + variant[i])
                         blnAcceptVariant = False
@@ -102,15 +109,48 @@ for ii in range(1000):
 
         if blnAcceptVariant:
             B.append(variant)
+    return B
 
-    A = deepcopy(B)
-    print(str(len(A)) + ' variants after elimination')
+#parse string according to GRAMMAR.
+def parse_string(s):
+    #1. tokenize
+    tokens = tokenize(s)
 
-    # print (len(A))
-    if not blnAnyVariantTransformed:
-        print('no rules left!')
-        print('Completed in ' + str(ii) + ' steps.')
-        break
+    print(tokens)
+    print('---')
+
+    A = [["S", ], ]  # initial rule
+    for variant in A:
+        print(variant)
+
+    for ii in range(1000):
+        print()
+        print('---')
+        print('step ' + str(ii))
+        # 2. produce.
+        B, blnAnyVariantTransformed = apply_grammar(A, GRAMMAR)
+        A = deepcopy(B)
+        print(str(len(A)) + ' variants before elimination')
+
+        # 3. eliminate non matched variants
+        B = eliminate_non_matching_variants(A, tokens)
+
+        A = deepcopy(B)
+        print(str(len(A)) + ' variants after elimination')
+
+        # print (len(A))
+        if not blnAnyVariantTransformed:
+            print('no rules left!')
+            print('Completed in ' + str(ii) + ' steps.')
+            break
+    return A
+
+
+# s="( landuse=harbour ) or ( industrial=port )"
+# s="amenity=atm or ( amenity=bank and atm=yes )"
+s = "( tag = value or  tag=value )    and tag=value"
+print(s)
+A = parse_string(s)
 
 for variant in A:
     print(variant)
