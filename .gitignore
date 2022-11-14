@@ -1,3 +1,4 @@
+.idea/
 __pycache__/*.*
 zOsm2GeoJSON/__pycache__/*.*
 00_Planet/planet-221031.osm.pbf.fdmdownload
