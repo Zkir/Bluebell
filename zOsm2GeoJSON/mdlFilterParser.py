@@ -1,4 +1,26 @@
+import re
 from copy import deepcopy
+
+
+# CONSTRUCTORS FOR RULES AND LITERALS
+# string constant
+class l: # string constant
+    def __init__(self, s):
+        self.value = s
+
+    def match(self, s):
+        return self.value == s
+
+# string constant
+class r: # string constant
+    def __init__(self, s):
+        self.value = s
+
+    def match(self, s):
+        return not (re.fullmatch(self.value, s) is None)
+
+
+#just a string constant
 
 # GRAMMAR DEFINITION
 GRAMMAR = [
@@ -9,14 +31,14 @@ GRAMMAR = [
     ['COMPLEX_EXPRESSION', ['OBRACKET', 'COMPLEX_EXPRESSION', 'CBRACKET']],
     ['COMPLEX_EXPRESSION', ['SIMPLE_EXPRESSION']],
     ['SIMPLE_EXPRESSION', ['TAG', 'EQ', 'VALUE']],
-    ['TAG', ['tag']],
-    ['VALUE', ['value']],
-    ['EQ', ['=']],
-    ['OR', ['or']],
-    ['AND', ['and']],
-    ['NOT', ['not']],
-    ['OBRACKET', ['(']],
-    ['CBRACKET', [')']]
+    ['TAG',      [r(r'[\w:]+')]],   #Letters, underscore _ and column :
+    ['VALUE',    [r(r'[^()=)]+')]], # Value can be anything, but we will exclude symbols used in this grammar, to make parsing a bit faster.
+    ['EQ',       [l(r'=')]],
+    ['OR',       [l(r'or')]],
+    ['AND',      [l(r'and')]],
+    ['NOT',      [l(r'not')]],
+    ['OBRACKET', [l(r'(')]],
+    ['CBRACKET', [l(r')')]]
 ]
 
 
@@ -92,12 +114,12 @@ def eliminate_non_matching_variants (A, tokens):
 
         for i in range(len(tokens)):
             if i < len(variant):
-                if (tokens[i] == variant[i]):
-                    # print('token matched! ' + tokens[i])
-                    pass
+                if type(variant[i]) is str:  # it's non-terminal lexeme, it cannot be tested (NB: terminal lexemes are l, non terminal lexemes are str
+                    break  # just skip variant,since it contains non-terminals, maybe it's correct after all lexemes expanded
                 else:
-                    if variant[i][0].isupper():  # it's non-terminal lexeme, it cannot be tested
-                        break  # just skip variant, maybe it's correct after all lexemes expanded
+                    if variant[i].match(tokens[i]):
+                        # print('token matched! ' + tokens[i])
+                        pass
                     else:
                         # print('token NOT matched! ' + variant[i])
                         blnAcceptVariant = False
@@ -146,13 +168,17 @@ def parse_string(s):
     return A
 
 
-# s="( landuse=harbour ) or ( industrial=port )"
-# s="amenity=atm or ( amenity=bank and atm=yes )"
-s = "( tag = value or  tag=value )    and tag=value"
+#s = "( landuse=harbour ) or ( industrial=port )"
+s = "amenity=atm or ( amenity=bank and atm=yes )"
+#s = r"( tag = value or  tag=value )    and tag=value"
+
 print(s)
+A = []
 A = parse_string(s)
 
+print('parsing result:')
 for variant in A:
-    print(variant)
+    for lexeme in variant:
+        print(lexeme.value, end =', ')
 print()
 print("That's all, folks!")
