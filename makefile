@@ -3,7 +3,8 @@
 # planet.pbf: osmupdate 
 # planet.pbf--> Country.o5m : osmconvert
 # Country.o5m --> feature.osm: osmfilter
-# 
+# feature.o5m --> feature.json: zOsm2GeoJSON
+# feature.json --> feature.shp: ogr2ogr 
 
 define generate_file
 	echo $< $@ 

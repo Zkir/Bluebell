@@ -33,11 +33,16 @@ class SyntaxTreeNode:
         fully_matched = False
 
     def str_representation(self):
-        s = self.nodename
-        s = str(s) + ' ('
-        for child in self.children:
-            s= s + child.str_representation()
-        s = s + ' ) '
+
+        if len(str(self.nodevalue))>0:
+            s = "'"+ str(self.nodevalue) + "'"
+        else:
+            s = str(self.nodename)
+        if len (self.children) > 0:
+            s = s + ' ['
+            for child in self.children:
+                s = s + child.str_representation()
+            s = s + '] '
         return s
 
     def __str__(self):
@@ -57,12 +62,8 @@ class SyntaxTreeNode:
 
     def get_tokens_str(self):
         tokens = []
-        if len(self.children) == 0:
-            if self.nodevalue!='':
-                tokens.append(str(self.nodevalue))
-                #print('"' + str(self.nodevalue) + '"')
-            else:
-                tokens.append(str(self.nodename))
+        if len(self.children) == 0 or (type(self.children[0].nodename) is r): #terminal lexeme
+            tokens.append(str(self.nodename))
 
         else:
             for child in self.children:
@@ -74,23 +75,24 @@ class SyntaxTreeNode:
 #just a string constant
 
 # GRAMMAR DEFINITION
+# Terminals/atoms in UPPER case
+# non-terminals in lower case 
 GRAMMAR = [
-    ['S', ['COMPLEX_EXPRESSION']],
+    ['s', ['complex_expression']],
+    ['complex_expression', ['complex_expression', 'OR', 'complex_expression']],
+    ['complex_expression', ['complex_expression', 'AND', 'complex_expression']],
+    ['complex_expression', ['NOT', 'complex_expression']],
+    ['complex_expression', ['OP', 'complex_expression', 'CP']],
+    ['complex_expression', ['simple_expression']],
+    ['simple_expression', ['TAG', 'EQ', 'VALUE']],    
     ['TAG',      [r(r'[\w:]+')]],   #Letters, underscore _ and column :
     ['VALUE',    [r(r'[^()=)]+')]], # Value can be anything, but we will exclude symbols used in this grammar, to make parsing a bit faster.
     ['EQ',       [l('=')]],
     ['OR',       [l('or')]],
     ['AND',      [l('and')]],
     ['NOT',      [l('not')]],
-    ['OBRACKET', [l('(')]],
-    ['CBRACKET', [l(')')]],
-    ['COMPLEX_EXPRESSION', ['SIMPLE_EXPRESSION']],
-    ['SIMPLE_EXPRESSION', ['TAG', 'EQ', 'VALUE']],
-
-    ['COMPLEX_EXPRESSION', ['COMPLEX_EXPRESSION', 'OR', 'COMPLEX_EXPRESSION']],
-    ['COMPLEX_EXPRESSION', ['COMPLEX_EXPRESSION', 'AND', 'COMPLEX_EXPRESSION']],
-    ['COMPLEX_EXPRESSION', ['NOT', 'COMPLEX_EXPRESSION']],
-    ['COMPLEX_EXPRESSION', ['OBRACKET', 'COMPLEX_EXPRESSION', 'CBRACKET']]
+    ['OP',       [l('(')]],
+    ['CP',       [l(')')]]
   
 ]
 
@@ -128,9 +130,10 @@ def expand_node(variant, GRAMMAR):
         lexeme = variant.nodename
         matching_rules = []
         for R in GRAMMAR:
-            if R[0] == lexeme:
+            if (R[0] == lexeme) and (R[0][0].islower()):
                 matching_rules.append(R)
-
+         
+        #apply rule     
         if len(matching_rules) > 0:
             blnVariantMatched = True
             for R in matching_rules:
@@ -157,22 +160,53 @@ def expand_node(variant, GRAMMAR):
                 pass
 
     return B
+    
+    
+def expand_node_terminals(variant, GRAMMAR):
+    
+    if len(variant.children) == 0:
+        lexeme = variant.nodename
+        matching_rules = []
+        for R in GRAMMAR:
+            if (R[0] == lexeme) and (R[0][0].isupper ()):
+                matching_rules.append(R)
+                
+        #Check that there is only one rule for terminal. 
+        if  len(matching_rules) > 1:
+            raise Exception("Terminals should be unique")
+         
+        #apply rule     
+        if len(matching_rules) > 0:
+            blnVariantMatched = True
+            for R in matching_rules:
+                for R1 in R[1]:
+                    variant.children.append(SyntaxTreeNode(R1))
+
+    else:
+        for i in range(len(variant.children)):
+            expand_node_terminals(variant.children[i], GRAMMAR)
+            
+
+    return None
 
 
 def apply_grammar(A, GRAMMAR):
     blnAnyVariantTransformed = False
     B = []
     for variant in A:
-        if not blnAnyVariantTransformed :
-            new_variants= expand_node(variant, GRAMMAR)
-            blnVariantMatched = (len(new_variants) > 0)
-            if blnVariantMatched:
-                B = B + new_variants
-                blnAnyVariantTransformed = True
-            else:
-                B.append(deepcopy(variant))  # Just copy variant if it was not transformed. it will be removed later.
+       
+        new_variants= expand_node(variant, GRAMMAR)
+        blnVariantMatched = (len(new_variants) > 0)
+        if blnVariantMatched:
+            B = B + new_variants
+            blnAnyVariantTransformed = True
         else:
             B.append(deepcopy(variant))  # Just copy variant if it was not transformed. it will be removed later.
+            
+    for variant in B:        
+        #separate process for terminal lexemes, they can be processed in place
+        expand_node_terminals(variant, GRAMMAR)
+        
     return B, blnAnyVariantTransformed
 
 
@@ -187,25 +221,51 @@ def eliminate_non_matching_variants (A, tokens):
         if len(variant) > len(tokens):
             # There are more lexems in variant than in parsed string. Variant is too long!
             blnAcceptVariant = False
-
-        for i in range(len(tokens)):
-            if i < len(variant):
+        else:  
+            j = 0
+            k = 0
+            blnMaySkipTokens = False
+            blnContainNonTerminals = False
+            for i in range(len(variant)):
+              
                 if type(variant[i]) is str:  # it's non-terminal lexeme, it cannot be tested (NB: terminal lexemes are l, non terminal lexemes are str
-                    break  # just skip variant,since it contains non-terminals, maybe it's correct after all lexemes expanded
+                    pass  # just skip variant,since it contains non-terminals, maybe it's correct after all lexemes expanded
+                    blnMaySkipTokens = True
+                    blnContainNonTerminals = True
                 else:
-                    if variant[i].match(tokens[i]):
-                        # print('token matched! ' + tokens[i])
-                        variant[i].nodevalue = tokens[i]
+                    blnTokenMatched = False
+                    if k>=len(tokens):
+                        pass
                     else:
-                        # print('token NOT matched! ' + variant[i])
+                        if blnMaySkipTokens:
+                            for j in range (k,len(tokens)):
+                                if variant[i].match(tokens[j]):
+                                    # print('token matched! ' + tokens[i])
+                                    blnTokenMatched = True
+                                    blnMaySkipTokens = False
+                                    variant[i].nodevalue = tokens[j]
+                                    k = j + 1
+                                    break
+                        else:
+                            if variant[i].match(tokens[k]):
+                                # print('token matched! ' + tokens[i])
+                                blnTokenMatched = True
+                                blnMaySkipTokens = False
+                                variant[i].nodevalue = tokens[k]
+                                k = k + 1
+
+                    if not blnTokenMatched:
+                        # no such token found
                         blnAcceptVariant = False
                         break
-            else:
-                # print('too short'+str(variant))
+            #all terminal tokens of variant are matched. But are there more tokens in the tail of original tokens?
+            if (not blnContainNonTerminals) and ( len(variant) != len(tokens) ):
+                #last token of varian is terminal and there are more tokens in original string
                 blnAcceptVariant = False
-                break
+
             # print("variant fully matched")
-            v.fully_matched = True
+            #v.fully_matched = True
+            
         if blnAcceptVariant:
             B.append(v)
     return B
@@ -227,14 +287,14 @@ def parse_string(s):
     print(tokens)
     print('---')
 
-    A = [SyntaxTreeNode("S"), ]  # initial rule
+    A = [SyntaxTreeNode("s"), ]  # initial rule
     #A = [SyntaxTreeNode("SIMPLE_EXPRESSION"), ]  # initial rule
 
     for variant in A:
         print(variant)
     print(' tokens: ' + str(variant.get_tokens()))
 
-    for ii in range(5000):
+    for ii in range(30):
         print()
         print('---')
         print('step ' + str(ii))
