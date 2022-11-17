@@ -5,7 +5,13 @@ zOsm2GeoJSON/__pycache__/*.*
 01_Countries/*.pbf
 01_Countries/*.o5m
 02_Interim_osm/*.osm
-99_Output/*.osm
+97_Sample/
+97_Sample/*/*.shp
+97_Sample/*/*.dbf
+97_Sample/*/*.shx
+97_Sample/*/*.prj
+
+
 99_Output/*.json
 99_Output/*.shp
 99_Output/*.dbf
@@ -13,3 +19,4 @@ zOsm2GeoJSON/__pycache__/*.*
 99_Output/*.prj
 99_Output/*.stat.txt
 99_Output.bak/*.*
+
