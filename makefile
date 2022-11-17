@@ -7,207 +7,231 @@
 
 define generate_file
 	echo $< $@ 
-	tools\osmfilter.exe 01_countries\$< $(1) -o=02_Interim_osm\$@.osm
-	zOsm2GeoJSON\zOsm2GeoJSON.py 02_Interim_osm\$@.osm 99_Output\$@.json --action=$(2) --filter="$(1)"
-	c:\OSGeo4W\bin\ogr2ogr.exe -skipfailures 99_output\$@.shp 99_output\$@.json	
+	tools\osmfilter.exe 01_countries\$< $(2) -o=02_Interim_osm\$@.osm
+	if not exist "99_Output\$(1)" md 99_Output\$(1)
+	zOsm2GeoJSON\zOsm2GeoJSON.py 02_Interim_osm\$@.osm 99_Output\$(1)\$@.json --action=$(3) $(2)
+	c:\OSGeo4W\bin\ogr2ogr.exe -skipfailures 99_output\$(1)\$@.shp 99_output\$(1)\$@.json	
 	echo $@
 endef
 
 
-full_build: belarus_roads_lines \
-            belarus_buildings_poly \
-            belarus_main_roads_lines \
-            belarus_railroads_lines \
-            belarus_urbanrail_lines \
-            belarus_dam_poi \
-            belarus_education_school_poi \
-            belarus_education_high_poi \
-            belarus_ferry_terminal_poi \
-            belarus_ferry_route_lines \
-            belarus_port_poi \
-            belarus_banks_poi \
-            belarus_atm_poi \
-            belarus_health_facilities_poi \
-            belarus_hospitals_poi \
-            belarus_marketplace_poi \
-            belarus_place_of_worship_poi \
-            belarus_refugee_site_poi \
-            belarus_border_control_poi \
-            belarus_settlements_poi \
-            belarus_townscities_poi \
-            belarus_bridges_poi \
-            belarus_pipeline_lines \
-            belarus_powerline_lines \
-            belarus_powerstation_poi \
-            belarus_substation_poi \
-            belarus_natural_water_poly \
-            belarus_militaryinstallation_poly \
-            belarus_railway_station_poi \
-            belarus_emergency_poi \
-            belarus_water_source_poi \
-            belarus_toilets_poi\
-            belarus_admin0_boundary_poly \
-            belarus_admin1_boundary_poly \
-            belarus_admin2_boundary_poly \
-            belarus_admin3_boundary_poly 
-
+full_build: tza_tran_rds_ln_s4_osm_pp_roads \
+            tza_tran_rds_ln_s4_osm_pp_mainroads \
+            tza_tran_rrd_ln_s4_osm_pp_railways \
+            tza_tran_rrd_ln_s4_osm_pp_subwaytram \
+            tza_phys_dam_pt_s4_osm_pp_dam \
+            tza_educ_edu_pt_s4_osm_pp_school \
+            tza_educ_uni_pt_s4_osm_pp_university\
+            tza_tran_fte_pt_s4_osm_pp_ferry_terminal \
+            tza_tran_fer_ln_s4_osm_pp_ferry_route \
+            tza_tran_por_pt_s4_osm_pp_port \
+            tza_cash_bnk_pt_s4_osm_pp_banks \
+            tza_cash_atm_pt_s4_osm_pp_atm \
+            tza_heal_hea_pt_s4_osm_pp_health_facilities \
+            tza_heal_hos_pt_s4_osm_pp_hospitals \
+            tza_cash_mkt_pt_s4_osm_pp_marketplace \
+            tza_pois_rel_pt_s4_osm_pp_place_of_worship \
+            tza_cccm_ref_pt_s4_osm_pp_refugee_site \
+            tza_pois_bor_pt_s4_osm_pp_border_control \
+            tza_stle_stl_pt_s4_osm_pp_settlements \
+            tza_stle_stl_pt_s4_osm_pp_townscities \
+            tza_tran_brg_pt_s4_osm_pp_bridges \
+            tza_util_ppl_ln_s4_osm_pp_pipeline \
+            tza_util_pwl_ln_s4_osm_pp_powerline \
+            tza_util_pst_pt_s4_osm_pp_powerstation \
+            tza_util_pst_pt_s4_osm_pp_substation \
+            tza_util_mil_py_s4_osm_pp_militaryinstallation \
+            tza_phys_lak_py_s4_osm_pp_natural_water \
+			tza_phys_riv_ln_s4_osm_pp_rivers \
+            tza_tran_can_ln_s4_osm_pp_canals \
+            tza_tran_rst_pt_s4_osm_pp_railway_station \
+            tza_shel_eaa_s4_osm_pp_emergency \
+            tza_wash_wts_s4_osm_pp_water_source \
+            tza_wash_toi_pt_s4_osm_pp_toilets\
+			tza_elev_cst_ln_s4_osm_pp_coastline \
+			tza_tran_air_pt_s0_osm_pp_airports \
+            tza_admn_ad0_py_s4_osm_pp_adminboundary0 \
+            tza_admn_ad1_py_s4_osm_pp_adminboundary1 \
+            tza_admn_ad2_py_s4_osm_pp_adminboundary2 \
+            tza_admn_ad3_py_s4_osm_pp_adminboundary3 \
+            tza_bldg_bdg_py_s4_osm_pp_buildings
+			
 	echo All targets completed OK
 
+#reg_elev_cst_ln_s0_osm_pp_coastline.shp
+
 #roads	
-belarus_roads_lines: belarus-latest.o5m
-	$(call generate_file, --keep= --keep-ways="highway=motorway =trunk =primary =secondary =tertiary  =unclassified =residential =motorway_link =trunk_link =primary_link =secondary_link =tertiary_link =lining_street =service =track =road",write_lines)
+tza_tran_rds_ln_s4_osm_pp_roads: tanzania-latest.o5m
+	$(call generate_file,232_tran,--keep= --keep-ways="highway=motorway =trunk =primary =secondary =tertiary  =unclassified =residential =motorway_link =trunk_link =primary_link =secondary_link =tertiary_link =lining_street =service =track =road",write_lines)
 
 #main roads	
-belarus_main_roads_lines: belarus-latest.o5m
-	$(call generate_file, --keep= --keep-ways="highway=motorway =trunk =primary =secondary =tertiary =motorway_link =trunk_link =primary_link =secondary_link =tertiary_link",write_lines)
+tza_tran_rds_ln_s4_osm_pp_mainroads: tanzania-latest.o5m
+	$(call generate_file,232_tran,--keep= --keep-ways="highway=motorway =trunk =primary =secondary =tertiary =motorway_link =trunk_link =primary_link =secondary_link =tertiary_link",write_lines)
 
 #railroads
-belarus_railroads_lines: belarus-latest.o5m
-	$(call generate_file, --keep= --keep-ways="railway=rail",write_lines)
+tza_tran_rrd_ln_s4_osm_pp_railways: tanzania-latest.o5m
+	$(call generate_file,232_tran, --keep= --keep-ways="railway=rail",write_lines)
 
 
 #urban rail
-belarus_urbanrail_lines: belarus-latest.o5m
-	$(call generate_file, --keep= --keep-ways="railway=subway =tram",write_lines)
+tza_tran_rrd_ln_s4_osm_pp_subwaytram: tanzania-latest.o5m
+	$(call generate_file,232_tran, --keep= --keep-ways="railway=subway =tram",write_lines)
 
 
 #dam
-belarus_dam_poi: belarus-latest.o5m
-	$(call generate_file, --keep="waterway=dam",write_poi)
+tza_phys_dam_pt_s4_osm_pp_dam: tanzania-latest.o5m
+	$(call generate_file,221_phys, --keep="waterway=dam",write_poi)
 
 
 #education_school
-belarus_education_school_poi: belarus-latest.o5m
-	$(call generate_file, --keep="amenity=school",write_poi)
+tza_educ_edu_pt_s4_osm_pp_school: tanzania-latest.o5m
+	$(call generate_file,210_educ,--keep="amenity=school",write_poi)
 
 
 #education_high
-belarus_education_high_poi: belarus-latest.o5m
-	$(call generate_file, --keep="amenity=college =university",write_poi)
+tza_educ_uni_pt_s4_osm_pp_university: tanzania-latest.o5m
+	$(call generate_file,210_educ,--keep="amenity=college =university",write_poi)
 
 
 #ferry terminal
-belarus_ferry_terminal_poi: belarus-latest.o5m
-	$(call generate_file, --keep="amenity=ferry_terminal",write_poi)
+tza_tran_fte_pt_s4_osm_pp_ferry_terminal: tanzania-latest.o5m
+	$(call generate_file,232_tran, --keep="amenity=ferry_terminal",write_poi)
 
 #ferry route
-belarus_ferry_route_lines: belarus-latest.o5m
-	$(call generate_file, --keep="route=ferry",write_lines)
+tza_tran_fer_ln_s4_osm_pp_ferry_route: tanzania-latest.o5m
+	$(call generate_file,232_tran, --keep="route=ferry",write_lines)
 
 #port
-belarus_port_poi: belarus-latest.o5m
-	$(call generate_file, --keep="( landuse=harbour =port ) or ( industrial=port ) ",write_poi)
+tza_tran_por_pt_s4_osm_pp_port: tanzania-latest.o5m
+	$(call generate_file,232_tran, --keep="( landuse=harbour =port ) or ( industrial=port ) ",write_poi)
 
 
 #banks
-belarus_banks_poi: belarus-latest.o5m
-	$(call generate_file, --keep="amenity=bank",write_poi)
+tza_cash_bnk_pt_s4_osm_pp_banks: tanzania-latest.o5m
+	$(call generate_file,208_cash, --keep="amenity=bank",write_poi)
 
 
-#atm: amenity=atm or amenity=bank + atm=yes
-belarus_atm_poi: belarus-latest.o5m
-	$(call generate_file, --keep="amenity=atm or ( amenity=bank and atm=yes )",write_poi)
+#atm 
+tza_cash_atm_pt_s4_osm_pp_atm: tanzania-latest.o5m
+	$(call generate_file,208_cash, --keep="amenity=atm or ( amenity=bank and atm=yes )",write_poi)
 
 #health_facilities
-belarus_health_facilities_poi: belarus-latest.o5m 
-	$(call generate_file, --keep="amenity=clinic =doctors =health_post =pharmacy =hospital",write_poi)	
+tza_heal_hea_pt_s4_osm_pp_health_facilities: tanzania-latest.o5m 
+	$(call generate_file,215_heal, --keep="amenity=clinic =doctors =health_post =pharmacy =hospital",write_poi)	
 
 #hospitals 
-belarus_hospitals_poi: belarus-latest.o5m 
-	$(call generate_file, --keep="amenity=hospital",write_poi)	
+tza_heal_hos_pt_s4_osm_pp_hospitals: tanzania-latest.o5m 
+	$(call generate_file,215_heal, --keep="amenity=hospital",write_poi)	
 
 
 #market_place
-belarus_marketplace_poi: belarus-latest.o5m 
-	$(call generate_file, --keep="amenity=marketplace",write_poi)	
+tza_cash_mkt_pt_s4_osm_pp_marketplace: tanzania-latest.o5m 
+	$(call generate_file,208_cash, --keep="amenity=marketplace",write_poi)	
 
 
 #place_of_worship
-belarus_place_of_worship_poi: belarus-latest.o5m
-	$(call generate_file, --keep="amenity=place_of_worship",write_poi)
+tza_pois_rel_pt_s4_osm_pp_place_of_worship: tanzania-latest.o5m
+	$(call generate_file,222_pois, --keep="amenity=place_of_worship",write_poi)
 
 
 #refugee_site
-belarus_refugee_site_poi: belarus-latest.o5m
-	$(call generate_file, --keep="amenity=refugee_site",write_poi)
+tza_cccm_ref_pt_s4_osm_pp_refugee_site: tanzania-latest.o5m
+	$(call generate_file,209_cccm, --keep="amenity=refugee_site",write_poi)
 
 
 #border_control
-belarus_border_control_poi: belarus-latest.o5m
-	$(call generate_file, --keep="barrier=border_control",write_poi)
+tza_pois_bor_pt_s4_osm_pp_border_control: tanzania-latest.o5m
+	$(call generate_file,222_pois, --keep="barrier=border_control",write_poi)
 
 #Settlements
-belarus_settlements_poi: belarus-latest.o5m
-	$(call generate_file, --keep="place=city =borough =town =village =hamlet",write_poi)
-
+tza_stle_stl_pt_s4_osm_pp_settlements: tanzania-latest.o5m
+	$(call generate_file,229_stle, --keep="place=city =borough =town =village =hamlet",write_poi)
 
 #townscities
-belarus_townscities_poi: belarus-latest.o5m
-	$(call generate_file, --keep="place=city =town",write_poi)
+tza_stle_stl_pt_s4_osm_pp_townscities: tanzania-latest.o5m
+	$(call generate_file,229_stle, --keep="place=city =town",write_poi)
 
 #Buildings!
-belarus_buildings_poly: belarus-latest.o5m
-	$(call generate_file, --keep="building= ",write_poly)
+tza_bldg_bdg_py_s4_osm_pp_buildings: tanzania-latest.o5m
+	$(call generate_file,206_bldg, --keep="building= ",write_poly)
 
 #bridges
-belarus_bridges_poi: belarus-latest.o5m
-	$(call generate_file, --keep="man_made=bridge",write_poi)
+tza_tran_brg_pt_s4_osm_pp_bridges: tanzania-latest.o5m
+	$(call generate_file,232_tran, --keep="man_made=bridge",write_poi)
 
 #pipeline
-belarus_pipeline_lines: belarus-latest.o5m
-	$(call generate_file, --keep="man_made=pipeline",write_lines)
+tza_util_ppl_ln_s4_osm_pp_pipeline: tanzania-latest.o5m
+	$(call generate_file,233_util, --keep="man_made=pipeline",write_lines)
 
 #powerline
-belarus_powerline_lines: belarus-latest.o5m
-	$(call generate_file, --keep="power=line",write_lines)
+tza_util_pwl_ln_s4_osm_pp_powerline: tanzania-latest.o5m
+	$(call generate_file,233_util, --keep="power=line",write_lines)
 
 #powerstation
-belarus_powerstation_poi: belarus-latest.o5m
-	$(call generate_file, --keep="power=plant",write_poi)
+tza_util_pst_pt_s4_osm_pp_powerstation: tanzania-latest.o5m
+	$(call generate_file,233_util, --keep="power=plant",write_poi)
 
 #substation
-belarus_substation_poi: belarus-latest.o5m
-	$(call generate_file, --keep="power=substation",write_poi)
+tza_util_pst_pt_s4_osm_pp_substation: tanzania-latest.o5m
+	$(call generate_file,233_util, --keep="power=substation",write_poi)
+
+#military areas
+tza_util_mil_py_s4_osm_pp_militaryinstallation: tanzania-latest.o5m 
+	$(call generate_file,233_util, --keep="landuse=military or military= ",write_poly)
+
+#water bodies
+tza_phys_lak_py_s4_osm_pp_natural_water: tanzania-latest.o5m 
+	$(call generate_file,221_phys, --keep="natural=water",write_poly)
+	
+#rivers as lines 
+tza_phys_riv_ln_s4_osm_pp_rivers: tanzania-latest.o5m 
+	$(call generate_file,221_phys, --keep="waterway=river",write_lines)
+
+#canals, for some reason in tran group
+tza_tran_can_ln_s4_osm_pp_canals: tanzania-latest.o5m 
+	$(call generate_file,232_tran, --keep="waterway=canal",write_lines)
 
 
-#natural=water
-belarus_natural_water_poly: belarus-latest.o5m 
-	$(call generate_file, --keep="natural=water",write_poly)	
-
-belarus_militaryinstallation_poly: belarus-latest.o5m 
-	$(call generate_file, --keep="landuse=military or military= ",write_poly)
-
-belarus_railway_station_poi: belarus-latest.o5m 
-	$(call generate_file, --keep="railway=station =halt ",write_poi)
+#railway stations
+tza_tran_rst_pt_s4_osm_pp_railway_station: tanzania-latest.o5m 
+	$(call generate_file,232_tran, --keep="railway=station =halt ",write_poi)
 
 #emergency 
-belarus_emergency_poi: belarus-latest.o5m 
-	$(call generate_file, --keep="emergency=assembly_point",write_poi)
+tza_shel_eaa_s4_osm_pp_emergency: tanzania-latest.o5m 
+	$(call generate_file,228_shel, --keep="emergency=assembly_point",write_poi)
 
 #water source 
-belarus_water_source_poi: belarus-latest.o5m 
-	$(call generate_file, --keep="amenity=drinking_water or drinking_water=yes ",write_poi)
+tza_wash_wts_s4_osm_pp_water_source: tanzania-latest.o5m 
+	$(call generate_file,234_wash, --keep="amenity=drinking_water or drinking_water=yes ",write_poi)
 
 #toilets
-belarus_toilets_poi: belarus-latest.o5m 
-	$(call generate_file, --keep="amenity=toilets",write_poi)
+tza_wash_toi_pt_s4_osm_pp_toilets: tanzania-latest.o5m 
+	$(call generate_file,234_wash, --keep="amenity=toilets",write_poi)
 
-belarus_admin0_boundary_poly: belarus-latest.o5m
-	$(call generate_file, --keep="( boundary=administrative ) and ( admin_level=2 )",write_poly)
+#admin boundaries
+# should be both lines and polygons
 
-belarus_admin1_boundary_poly: belarus-latest.o5m
-	$(call generate_file, --keep="boundary=administrative and admin_level=4",write_poly)
+tza_admn_ad0_py_s4_osm_pp_adminboundary0: tanzania-latest.o5m
+	$(call generate_file,202_admn, --keep="( boundary=administrative ) and ( admin_level=2 )",write_poly)
 
-belarus_admin2_boundary_poly: belarus-latest.o5m
-	$(call generate_file, --keep="boundary=administrative and admin_level=6",write_poly)
+tza_admn_ad1_py_s4_osm_pp_adminboundary1: tanzania-latest.o5m
+	$(call generate_file,202_admn, --keep="boundary=administrative and admin_level=4",write_poly)
 
-belarus_admin3_boundary_poly: belarus-latest.o5m
-	$(call generate_file, --keep="boundary=administrative admin_level=7 =8 =9 =10",write_poly)
+tza_admn_ad2_py_s4_osm_pp_adminboundary2: tanzania-latest.o5m
+	$(call generate_file,202_admn, --keep="boundary=administrative and admin_level=6",write_poly)
 
+tza_admn_ad3_py_s4_osm_pp_adminboundary3: tanzania-latest.o5m
+	$(call generate_file,202_admn, --keep="boundary=administrative admin_level=7 =8 =9 =10",write_poly)
 
+#coast lines 	
+tza_elev_cst_ln_s4_osm_pp_coastline: tanzania-latest.o5m
+	$(call generate_file,211_elev, --keep="natural=coastline",write_lines)
 
+#airports	
+tza_tran_air_pt_s4_osm_pp_airports: tanzania-latest.o5m
+	$(call generate_file,232_tran, --keep="aeroway=aerodrome",write_poi)
 #==================Country ==================================================================
 
-belarus-latest.o5m:
+tanzania-latest.o5m:
 	echo just assume that the county file is present
   
