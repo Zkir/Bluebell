@@ -330,9 +330,67 @@ def parse_string(s):
         assign_nodes_to_parsed_tree(variant, deepcopy(tokens))
     return A
 
-#s = "( amenity=bank ) and atm=yes "
+# convert tree to polish notation
+def precompile_parsed_tree(variant, polish):
+
+    if len(variant.children) == 0:
+        polish.append(variant.nodevalue)
+    else:
+        if variant.nodename == "complex_expression":
+            if len(variant.children) == 1:
+                if variant.children[0].nodename == 'simple_expression':
+                    precompile_parsed_tree(variant.children[0], polish)
+
+            elif len(variant.children) == 2:
+                # not
+                if (variant.children[0].nodename == 'NOT') and (
+                        variant.children[1].nodename == 'complex_expression'):
+                    polish.append(variant.children[0].nodename)
+                    precompile_parsed_tree(variant.children[1], polish)
+                else:
+                    raise Exception('unexpected node ' + str(variant))
+            elif len(variant.children) == 3:
+                # parenthesis
+                if (variant.children[0].nodename == 'OP') and (variant.children[1].nodename == 'complex_expression') and (
+                        variant.children[2].nodename == 'CP'):
+                    precompile_parsed_tree(variant.children[1], polish)
+                #or
+                elif (variant.children[0].nodename == 'complex_expression') and (
+                            variant.children[1].nodename == 'OR') and (
+                            variant.children[2].nodename == 'complex_expression'):
+                    polish.append(variant.children[1].nodename)
+                    precompile_parsed_tree(variant.children[0], polish)
+                    precompile_parsed_tree(variant.children[2], polish)
+                # and
+                elif (variant.children[0].nodename == 'complex_expression') and (
+                            variant.children[1].nodename == 'AND') and (
+                            variant.children[2].nodename == 'complex_expression'):
+                    polish.append(variant.children[1].nodename)
+                    precompile_parsed_tree(variant.children[0], polish)
+                    precompile_parsed_tree(variant.children[2], polish)
+                else:
+                    raise Exception('unexpected node ' + str(variant))
+            else:
+                raise Exception ('unexpected node ' + str(variant) )
+
+        elif variant.nodename == "simple_expression":
+            # comparison
+            if (variant.children[0].nodename == 'TAG') and (variant.children[1].nodename == 'EQ') and (
+                    variant.children[2].nodename == 'VALUE'):
+                polish.append(variant.children[1].nodename) #comparison operator
+                polish.append(variant.children[0].nodename) #Tag
+                polish.append('"'+variant.children[0].children[0].nodevalue+'"')  # tag
+                polish.append('"'+variant.children[2].children[0].nodevalue+'"')  # Value
+        else:
+            for child in variant.children:
+                precompile_parsed_tree(child, polish)
+
+    return None
+
+#=================================================================================
+#s = "( not amenity=atm ) or ( amenity=bank )"
 #s = "( landuse=harbour ) or ( industrial=port )"
-s = "( amenity=atm ) or ( amenity=bank and atm=yes ) or ( building=bank )"
+s = "( amenity=atm ) or  ( amenity=bank and atm=yes ) and ( building=bank ) or ( test=test1 )"
 
 
 print(s)
@@ -352,7 +410,13 @@ for variant in A:
     print()
 
     print("-----------------------------------------")
-   # variant.print_as_tree()
+    polish = []
+    precompile_parsed_tree(variant, polish)
+    for i in reversed(range (len(polish))):
+            print(polish[i], end=' ')
+    print()
+
+    # variant.print_as_tree()
     print("-----------------------------------------")
 
 
