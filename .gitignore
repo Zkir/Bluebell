@@ -14,3 +14,4 @@ zOsm2GeoJSON/__pycache__/*.*
 99_Output/**/*.stat.txt
 
 /antlr-based/
+zOsm2GeoJSON/test.py

@@ -50,7 +50,7 @@ full_build: tza_tran_rds_ln_s4_osm_pp_roads \
             tza_wash_wts_s4_osm_pp_water_source \
             tza_wash_toi_pt_s4_osm_pp_toilets\
 			tza_elev_cst_ln_s4_osm_pp_coastline \
-			tza_tran_air_pt_s0_osm_pp_airports \
+			tza_tran_air_pt_s4_osm_pp_airports \
             tza_admn_ad0_py_s4_osm_pp_adminboundary0 \
             tza_admn_ad1_py_s4_osm_pp_adminboundary1 \
             tza_admn_ad2_py_s4_osm_pp_adminboundary2 \
@@ -222,7 +222,7 @@ tza_admn_ad2_py_s4_osm_pp_adminboundary2: tanzania-latest.o5m
 	$(call generate_file,202_admn, --keep="boundary=administrative and admin_level=6",write_poly)
 
 tza_admn_ad3_py_s4_osm_pp_adminboundary3: tanzania-latest.o5m
-	$(call generate_file,202_admn, --keep="boundary=administrative admin_level=7 =8 =9 =10",write_poly)
+	$(call generate_file,202_admn, --keep="( boundary=administrative ) and ( admin_level=7 or admin_level=8 or admin_level=9 or admin_level=10 )",write_poly)
 
 #coast lines 	
 tza_elev_cst_ln_s4_osm_pp_coastline: tanzania-latest.o5m
