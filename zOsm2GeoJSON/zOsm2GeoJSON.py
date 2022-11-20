@@ -1,10 +1,9 @@
 ﻿import time
-import subprocess
 import sys
+from datetime import datetime
 
 from mdlOsmParser import readOsmXml, encodeXmlString
-from osmGeometry import clsOsmGeometry
-from mdlXmlParser import clsXMLparser
+from mdlFilterParser import parse_filter
 
 def escapeJsonString(s):
     s = s.replace("\"","" )
@@ -28,6 +27,16 @@ def writeGeoJson(Objects, objOsmGeom, strOutputFile, strAction, allowed_tags):
     fo = open(strOutputFile, 'w', encoding="utf-8")
     fo.write('{ \n') 
     fo.write('    "type": "FeatureCollection",\n')
+    # "generator" : "bluebell/zOsm2GeoJSON"  \n
+    # "generation_date" : "+ datetime.now().strftime("%Y-%m-%dT%H:%M:%S")+" \n
+    # "last_known_edit_date": "YYYY-MM-DD"
+    # "geoextent": strOutputFile[0:3]
+    # "category": strOutputFile[4:8]
+    # "theme": strOutputFile[9:12]
+    # "geometry_type": strOutputFile[13:15]
+    # "scale": strOutputFile[15:17]
+    # "source": "OpenStreetMap"
+    # "permission": strOutputFile[23:25]
     fo.write('    "features": [\n')
 
     j=0
@@ -211,6 +220,7 @@ def createJson(strInputOsmFile, strOutputFileName,strAction,strFilter):
     print ("filter: " + strFilter)
 
     t1 = time.time()
+    parse_filter(strFilter)
 
     objOsmGeom, Objects = readOsmXml(strInputOsmFile)
     SelectedObjects = filterObjects(Objects, strFilter, strAction)
