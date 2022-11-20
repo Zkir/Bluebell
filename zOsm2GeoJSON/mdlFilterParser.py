@@ -1,3 +1,7 @@
+# this module contains partial implementation of the osmfilter commandline parser,
+# including object filtering. Some features are supported, others are not.
+# see  https://wiki.openstreetmap.org/wiki/Osmfilter
+
 import re
 from copy import deepcopy
 
@@ -76,24 +80,44 @@ class SyntaxTreeNode:
 
 # GRAMMAR DEFINITION
 # Terminals/atoms in UPPER case
-# non-terminals in lower case 
+# non-terminals in lower case
+
+
 GRAMMAR = [
-    ['s', ['complex_expression']],
+    ['s', ['keep_expression']],
+    ['s', ['keep_expression', 'keep_expression']],
+    ['keep_expression', ['keep','EQ']],
+    ['keep_expression', ['keep','EQ','QUOTE','complex_expression','QUOTE']],
+    ['keep_expression', ['keep','EQ','complex_expression']],
+    # ['s', ['complex_expression']],
+    ['keep', ['KEEP']],
+    ['keep', ['KEEP_NODES']],
+    ['keep', ['KEEP_WAYS']],
+    ['keep', ['KEEP_RELATIONS']],
     ['complex_expression', ['complex_expression', 'OR', 'complex_expression']],
     ['complex_expression', ['complex_expression', 'AND', 'complex_expression']],
     ['complex_expression', ['NOT', 'complex_expression']],
     ['complex_expression', ['OP', 'complex_expression', 'CP']],
     ['complex_expression', ['simple_expression']],
-    ['simple_expression', ['TAG', 'EQ', 'VALUE']],    
-    ['TAG',      [r(r'[\w:]+')]],   #Letters, underscore _ and column :
-    ['VALUE',    [r(r'[^()=)]+')]], # Value can be anything, but we will exclude symbols used in this grammar, to make parsing a bit faster.
-    ['EQ',       [l('=')]],
-    ['OR',       [l('or')]],
-    ['AND',      [l('and')]],
-    ['NOT',      [l('not')]],
-    ['OP',       [l('(')]],
-    ['CP',       [l(')')]]
-  
+    ['simple_expression', ['TAG', 'EQ']],
+    ['simple_expression', ['TAG', 'EQ', 'VALUE']],
+    ['simple_expression', ['TAG', 'EQ', 'VALUE', 'additional_value']],
+    ['additional_value', ['EQ', 'VALUE']],
+    ['additional_value', ['EQ', 'VALUE','additional_value']],
+    ['TAG',            [r(r'[\w:]+')]],   #Letters, underscore _ and column :
+    ['VALUE',          [r(r'[^()=)]+')]], # Value can be anything, but we will exclude symbols used in this grammar, to make parsing a bit faster.
+    ['EQ',             [l('=')]],
+    ['OR',             [l('or')]],
+    ['AND',            [l('and')]],
+    ['NOT',            [l('not')]],
+    ['OP',             [l('(')]],
+    ['CP',             [l(')')]],
+    ['QUOTE',          [l('"')]],
+    ['KEEP',           [l('--keep')]],
+    ['KEEP_NODES',     [l('--keep-nodes')]],
+    ['KEEP_WAYS',      [l('--keep-ways')]],
+    ['KEEP_RELATIONS', [l('--keep-relations')]]
+
 ]
 
 
@@ -113,11 +137,11 @@ def tokenize(s):
                 tokens.append(token)
             k = i + 1
 
-        if s[i] == "=":
+        if (s[i] == "=") or (s[i] == '"'):
             token = s[k:i]
             if token != '':  # no need to add empty token
                 tokens.append(token)
-            tokens.append('=')
+            tokens.append(s[i])
             k = i + 1
     return tokens
 
@@ -272,7 +296,10 @@ def eliminate_non_matching_variants (A, tokens):
 
 def assign_nodes_to_parsed_tree(variant, tokens):
     if len(variant.children) == 0:
-        variant.nodevalue = tokens.pop(0)
+        if type (variant.nodename) is str:
+            raise Exception ('non-terminal lexem ' + variant.nodename + ' cannot be matched with token' )
+        else:
+            variant.nodevalue = tokens.pop(0)
     else:
         for child in variant.children:
             assign_nodes_to_parsed_tree(child, tokens)
@@ -280,51 +307,53 @@ def assign_nodes_to_parsed_tree(variant, tokens):
     return None
 
 #parse string according to GRAMMAR.
-def parse_string(s):
+def parse_filter(s, verbose = False  ):
     #1. tokenize
     tokens = tokenize(s)
 
-    print(tokens)
-    print('---')
+    if verbose:
+        print(tokens)
+        print('---')
 
     A = [SyntaxTreeNode("s"), ]  # initial rule
     #A = [SyntaxTreeNode("SIMPLE_EXPRESSION"), ]  # initial rule
 
-    for variant in A:
-        print(variant)
-    print(' tokens: ' + str(variant.get_tokens()))
+    if verbose:
+        for variant in A:
+            print(variant)
+        print(' tokens: ' + str(variant.get_tokens()))
 
-    for ii in range(30):
-        print()
-        print('---')
-        print('step ' + str(ii))
+    for ii in range(200):
+        if verbose:
+            print()
+            print('---')
+            print('step ' + str(ii))
         # 2. produce.
         B, blnAnyVariantTransformed = apply_grammar(A, GRAMMAR)
         A = deepcopy(B)
-        print(str(len(A)) + ' variants before elimination')
+        if verbose:
+            print(str(len(A)) + ' variants before elimination')
 
         # 3. eliminate non matched variants
         B = eliminate_non_matching_variants(A, tokens)
         A = deepcopy(B)
 
+        if verbose:
+            print(str(len(A)) + ' variants after elimination')
+            for variant in A:
+                var_tokens= variant.get_tokens_str()
+                print(var_tokens)
 
-        print(str(len(A)) + ' variants after elimination')
-        for variant in A:
-            var_tokens= variant.get_tokens_str()
-            print(var_tokens)
-            #print(' tokens: ', end='')
-            #for t in var_tokens:
-            #    if type(t) is str:
-            #        print(str(t), end=' ')
-            #    else:
-            #        print(t.value, end=' ')
-            #print()
 
-        # print (len(A))
+
         if not blnAnyVariantTransformed:
-            print('no rules left!')
-            print('Completed in ' + str(ii) + ' steps.')
+            if verbose:
+                print('no rules left!')
+                print('Completed in ' + str(ii) + ' steps.')
             break
+
+    if len(A) == 0:
+        raise Exception("unable to parse filter expression: " + s)
 
     for variant in A:
         assign_nodes_to_parsed_tree(variant, deepcopy(tokens))
@@ -387,38 +416,45 @@ def precompile_parsed_tree(variant, polish):
 
     return None
 
+
 #=================================================================================
-#s = "( not amenity=atm ) or ( amenity=bank )"
-#s = "( landuse=harbour ) or ( industrial=port )"
-s = "( amenity=atm ) or  ( amenity=bank and atm=yes ) and ( building=bank ) or ( test=test1 )"
+def main():
+    #s = "( not amenity=atm ) or ( amenity=bank )"
+    #s = "( landuse=harbour ) or ( industrial=port )"
+    #s = "( amenity=atm ) or  ( amenity=bank and atm=yes ) and ( building=bank ) or ( test=test1 )"
+    #s = '--keep-ways="railway=rail"'
+    #s = '--keep= --keep-ways="( amenity=atm ) or  ( amenity=bank and atm=yes ) and ( building=bank ) or ( test=test1 )"'
+    #s = '--keep= --keep-ways="highway=motorway =trunk =primary =secondary =tertiary  =unclassified =residential =motorway_link =trunk_link =primary_link =secondary_link =tertiary_link =lining_street =service =track =road"'
+    s= '--keep=boundary=administrative and admin_level=7 =8 =9 =10'
+    print(s)
+
+    A = parse_filter(s)
+
+    print('parsing result:')
+    for variant in A:
+        print(variant)
+        print(' tokens: ', end='')
+        var_tokens = variant.get_tokens_str()
+        for t in var_tokens:
+            if type(t) is str:
+                print(t, end=' ')
+            else:
+                print(t.value, end=' ')
+        print()
+
+        print("-----------------------------------------")
+        polish = []
+        precompile_parsed_tree(variant, polish)
+        for i in reversed(range (len(polish))):
+                print(polish[i], end=' ')
+        print()
+
+        # variant.print_as_tree()
+        print("-----------------------------------------")
 
 
-print(s)
-
-A = parse_string(s)
-
-print('parsing result:')
-for variant in A:
-    print(variant)
-    print(' tokens: ', end='')
-    var_tokens = variant.get_tokens_str()
-    for t in var_tokens:
-        if type(t) is str:
-            print(t, end=' ')
-        else:
-            print(t.value, end=' ')
     print()
+    print("That's all, folks!")
 
-    print("-----------------------------------------")
-    polish = []
-    precompile_parsed_tree(variant, polish)
-    for i in reversed(range (len(polish))):
-            print(polish[i], end=' ')
-    print()
-
-    # variant.print_as_tree()
-    print("-----------------------------------------")
-
-
-print()
-print("That's all, folks!")
+if __name__ == '__main__':
+    main()
