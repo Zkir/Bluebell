@@ -15,8 +15,8 @@ def escapeJsonString(s):
     return s
     
 #most uncertain part, we need to create parcer for osmfilter filter!     
-def evaluateFilter(object_filter, osmtags):
-    blnResult = evaluate_tree(object_filter, osmtags)
+def evaluateFilter(object_filter, osmtags,object_type):
+    blnResult = evaluate_tree(object_filter, osmtags, object_type)
     return blnResult
 
 def writeGeoJson(Objects, objOsmGeom, strOutputFile, strAction, allowed_tags):
@@ -147,7 +147,7 @@ def filterObjects(Objects, object_filter, strAction):
         #print (str(osmObject.type)+str(osmObject.id))    
         #filter out objects without tabs. they cannot make any "features"
         blnFilter = len(osmObject.osmtags)>0 
-        blnFilter = blnFilter and evaluateFilter(object_filter, osmObject.osmtags )
+        blnFilter = blnFilter and evaluateFilter(object_filter, osmObject.osmtags, osmObject.type )
         #funny enough, filter depends on action too
         if (strAction == "write_lines") or (strAction == "write_poly"):
 

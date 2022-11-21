@@ -416,37 +416,51 @@ def precompile_parsed_tree(variant, polish):
 
     return None
 
-
-def evaluate_tree(variant, osmtags):
+#variant: syntax tree, osmtags: dict with tags, object_type: node/way/relation:
+def evaluate_tree(variant, osmtags, object_type):
 
     if len(variant.children) == 0:
         return variant.nodevalue
         #raise Exception ('no idea what to do')
     else:
         if variant.nodename=="s":
-            if len(variant.children)>1:
-                raise Exception('I do not really know what to do with multiple keep expressions')
-            else:
-                return evaluate_tree(variant.children[0], osmtags)
+            blnResult = False
+            if len(variant.children) == 0:
+                raise Exception('No keep/drop elements!')
 
-        if variant.nodename == 'keep_expression':
+            #it seems that if there are several keep expressions e.g. --keep="a=b" --keep-ways="c=d"
+            #the consequent ones should override the previous, if applicable.
+            #TODO: this may be wrong.
+
+            for child in variant.children:
+                strKeepType = child.children[0].children[0].nodename
+                if (strKeepType == 'KEEP') or (strKeepType == 'KEEP_NODES' and object_type == "node") or (
+                        strKeepType == 'KEEP_WAYS' and object_type == "way") or (
+                        strKeepType == 'KEEP_RELATIONS' and object_type == "relation"):
+                    blnResult = evaluate_tree(child, osmtags, object_type)
+            return blnResult
+
+        elif variant.nodename == 'keep_expression':
+            #keep_expression contains only one element that should be evaluated.
             if len(variant.children) == 5:
-                return evaluate_tree(variant.children[3], osmtags)
+                return evaluate_tree(variant.children[3], osmtags, object_type)
             elif len(variant.children) == 3:
-                return evaluate_tree(variant.children[2], osmtags)
+                return evaluate_tree(variant.children[2], osmtags, object_type)
+            elif len(variant.children) == 2:
+                return False
             else:
                 raise Exception('too many or too few elements in keep_expression')
 
-        if variant.nodename == "complex_expression":
+        elif variant.nodename == "complex_expression":
             if len(variant.children) == 1:
                 if variant.children[0].nodename == 'simple_expression':
-                    return evaluate_tree(variant.children[0], osmtags)
+                    return evaluate_tree(variant.children[0], osmtags,object_type)
 
             elif len(variant.children) == 2:
                 # not
                 if (variant.children[0].nodename == 'NOT') and (
                         variant.children[1].nodename == 'complex_expression'):
-                    return not evaluate_tree(variant.children[1], osmtags)
+                    return not evaluate_tree(variant.children[1], osmtags,object_type)
                 else:
                     raise Exception('unexpected node ' + str(variant))
             elif len(variant.children) == 3:
@@ -454,27 +468,26 @@ def evaluate_tree(variant, osmtags):
                 if (variant.children[0].nodename == 'OP') and (
                         variant.children[1].nodename == 'complex_expression') and (
                         variant.children[2].nodename == 'CP'):
-                    return evaluate_tree(variant.children[1], osmtags)
+                    return evaluate_tree(variant.children[1], osmtags,object_type)
                 # or
                 elif (variant.children[0].nodename == 'complex_expression') and (
                         variant.children[1].nodename == 'OR') and (
                         variant.children[2].nodename == 'complex_expression'):
-                    v1 = evaluate_tree(variant.children[0], osmtags)
-                    v2 = evaluate_tree(variant.children[2], osmtags)
+                    v1 = evaluate_tree(variant.children[0], osmtags, object_type)
+                    v2 = evaluate_tree(variant.children[2], osmtags, object_type)
                     return v1 or v2
                 # and
                 elif (variant.children[0].nodename == 'complex_expression') and (
                         variant.children[1].nodename == 'AND') and (
                         variant.children[2].nodename == 'complex_expression'):
 
-                     v1 = evaluate_tree(variant.children[0], osmtags)
-                     v2 = evaluate_tree(variant.children[2], osmtags)
+                     v1 = evaluate_tree(variant.children[0], osmtags, object_type)
+                     v2 = evaluate_tree(variant.children[2], osmtags, object_type)
                      return v1 and v2
                 else:
                     raise Exception('unexpected node ' + str(variant))
             else:
                 raise Exception('unexpected node ' + str(variant))
-
 
         elif variant.nodename == "simple_expression": #it's rather tag comparison expression!
             if (variant.children[0].nodename == 'TAG') and (variant.children[1].nodename == 'EQ') and (
@@ -487,8 +500,9 @@ def evaluate_tree(variant, osmtags):
             else:
                 raise Exception('too many or too few elements in comparison/simple_expession')
         else:
-            for child in variant.children:
-                evaluate_tree(child, osmtags)
+            raise Exception('no idea how to evaluate note: ' + variant.nodename)
+            #for child in variant.children:
+            #    evaluate_tree(child, osmtags)
 
 
 
@@ -501,14 +515,16 @@ def main():
     #s = "( landuse=harbour ) or ( industrial=port )"
     #s = "( amenity=atm ) or  ( amenity=bank and atm=yes ) and ( building=bank ) or ( test=test1 )"
     #s = '--keep-ways="railway=rail"'
-    #s = '--keep= --keep-ways="( amenity=atm ) or  ( amenity=bank and atm=yes ) and ( building=bank ) or ( test=test1 )"'
-    #s = '--keep= --keep-ways="highway=motorway =trunk =primary =secondary =tertiary  =unclassified =residential =motorway_link =trunk_link =primary_link =secondary_link =tertiary_link =lining_street =service =track =road"'
+
+    s = '--keep= --keep-ways="highway=motorway =trunk =primary =secondary =tertiary  =unclassified =residential =motorway_link =trunk_link =primary_link =secondary_link =tertiary_link =lining_street =service =track =road"'
+    osmtags = {"highway": "motorway"}
+    object_type = "way"
     #s= '--keep=boundary=administrative and admin_level=7 =8 =9 =10'
-    s = '--keep="( amenity=place_of_worship ) and ( amenity=place_of_worship1 )"'
-    osmtags = {"amenity": "place_of_worship"}
+    #s = '--keep="( amenity=place_of_worship ) and ( amenity=place_of_worship1 )"'
+    # osmtags = {"amenity": "place_of_worship"}
     print(s)
 
-    variant = parse_filter(s, True)
+    variant = parse_filter(s, True )
 
     print('parsing result:')
 
@@ -529,7 +545,7 @@ def main():
     #        print(polish[i], end=' ')
     #print()
 
-    print( evaluate_tree(variant, osmtags))
+    print( evaluate_tree(variant, osmtags, object_type))
 
     # variant.print_as_tree()
     print("-----------------------------------------")
