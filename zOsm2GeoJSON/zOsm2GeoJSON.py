@@ -1,9 +1,12 @@
 ﻿import time
 import sys
 from datetime import datetime
+import os
 
 from mdlOsmParser import readOsmXml, encodeXmlString
 from mdlFilterParser import parse_filter
+from mdlFilterParser import evaluate_tree
+
 
 def escapeJsonString(s):
     s = s.replace("\"","" )
@@ -12,31 +15,27 @@ def escapeJsonString(s):
     return s
     
 #most uncertain part, we need to create parcer for osmfilter filter!     
-def evaluateFilter(strFilter, osmtags):
-    #print(strFilter + '\n') 
-    blnResult = True
-    #if strFilter.find("admin_level=2")!=-1: 
-    #    blnResult =  (blnResult and (osmtags.get("admin_level",'')=="2" ))
-    #    
-    #if strFilter.find("admin_level=4")!=-1: 
-    #    blnResult =  (blnResult and (osmtags.get("admin_level",'')=="4" ))    
+def evaluateFilter(object_filter, osmtags):
+    blnResult = evaluate_tree(object_filter, osmtags)
     return blnResult
 
 def writeGeoJson(Objects, objOsmGeom, strOutputFile, strAction, allowed_tags):
     
     fo = open(strOutputFile, 'w', encoding="utf-8")
+    fname = os.path.basename(strOutputFile)
+
     fo.write('{ \n') 
     fo.write('    "type": "FeatureCollection",\n')
-    # "generator" : "bluebell/zOsm2GeoJSON"  \n
-    # "generation_date" : "+ datetime.now().strftime("%Y-%m-%dT%H:%M:%S")+" \n
-    # "last_known_edit_date": "YYYY-MM-DD"
-    # "geoextent": strOutputFile[0:3]
-    # "category": strOutputFile[4:8]
-    # "theme": strOutputFile[9:12]
-    # "geometry_type": strOutputFile[13:15]
-    # "scale": strOutputFile[15:17]
-    # "source": "OpenStreetMap"
-    # "permission": strOutputFile[23:25]
+    #fo.write('    "generator" : "bluebell-zOsm2GeoJSON",\n')
+    #fo.write('    "generation_date" : "' + escapeJsonString(datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))+'", \n')
+    #fo.write('    "last_known_edit_date": "YYYY-MM-DD",\n')
+    #fo.write('    "geoextent": "'+escapeJsonString(fname[0:3])+'",\n')
+    #fo.write('    "category": "'+escapeJsonString(fname[4:8])+'",\n')
+    #fo.write('    "theme": "'+escapeJsonString(fname[9:12])+'",\n')
+    #fo.write('    "geometry_type": "'+escapeJsonString(fname[13:15])+'",\n')
+    #fo.write('    "scale": "'+escapeJsonString(fname[16:18])+'",\n')
+    #fo.write('    "source": "OpenStreetMap",\n')
+    #fo.write('    "permission": "'+escapeJsonString(fname[23:25])+'",\n')
     fo.write('    "features": [\n')
 
     j=0
@@ -141,13 +140,14 @@ def writeGeoJson(Objects, objOsmGeom, strOutputFile, strAction, allowed_tags):
 
 
 # lets's filter out something, we are interested only in particular objects
-def filterObjects(Objects, strFilter, strAction):
+def filterObjects(Objects, object_filter, strAction):
     SelectedObjects = []
+    print(str(object_filter) + '\n')
     for osmObject in Objects:
         #print (str(osmObject.type)+str(osmObject.id))    
         #filter out objects without tabs. they cannot make any "features"
         blnFilter = len(osmObject.osmtags)>0 
-        blnFilter = blnFilter and evaluateFilter(strFilter, osmObject.osmtags )
+        blnFilter = blnFilter and evaluateFilter(object_filter, osmObject.osmtags )
         #funny enough, filter depends on action too
         if (strAction == "write_lines") or (strAction == "write_poly"):
 
@@ -220,10 +220,10 @@ def createJson(strInputOsmFile, strOutputFileName,strAction,strFilter):
     print ("filter: " + strFilter)
 
     t1 = time.time()
-    parse_filter(strFilter)
+    object_filter = parse_filter(strFilter)
 
     objOsmGeom, Objects = readOsmXml(strInputOsmFile)
-    SelectedObjects = filterObjects(Objects, strFilter, strAction)
+    SelectedObjects = filterObjects(Objects, object_filter, strAction)
 
     allowed_tags = writeTagStatistics(strOutputFileName+'.stat.txt',SelectedObjects)
     

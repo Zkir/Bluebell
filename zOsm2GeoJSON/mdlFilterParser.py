@@ -357,11 +357,11 @@ def parse_filter(s, verbose = False  ):
 
     for variant in A:
         assign_nodes_to_parsed_tree(variant, deepcopy(tokens))
-    return A
+
+    return A[0] #the first variant is considered to be the best one from all the alternatives
 
 # convert tree to polish notation
 def precompile_parsed_tree(variant, polish):
-
     if len(variant.children) == 0:
         polish.append(variant.nodevalue)
     else:
@@ -417,6 +417,84 @@ def precompile_parsed_tree(variant, polish):
     return None
 
 
+def evaluate_tree(variant, osmtags):
+
+    if len(variant.children) == 0:
+        return variant.nodevalue
+        #raise Exception ('no idea what to do')
+    else:
+        if variant.nodename=="s":
+            if len(variant.children)>1:
+                raise Exception('I do not really know what to do with multiple keep expressions')
+            else:
+                return evaluate_tree(variant.children[0], osmtags)
+
+        if variant.nodename == 'keep_expression':
+            if len(variant.children) == 5:
+                return evaluate_tree(variant.children[3], osmtags)
+            elif len(variant.children) == 3:
+                return evaluate_tree(variant.children[2], osmtags)
+            else:
+                raise Exception('too many or too few elements in keep_expression')
+
+        if variant.nodename == "complex_expression":
+            if len(variant.children) == 1:
+                if variant.children[0].nodename == 'simple_expression':
+                    return evaluate_tree(variant.children[0], osmtags)
+
+            elif len(variant.children) == 2:
+                # not
+                if (variant.children[0].nodename == 'NOT') and (
+                        variant.children[1].nodename == 'complex_expression'):
+                    return not evaluate_tree(variant.children[1], osmtags)
+                else:
+                    raise Exception('unexpected node ' + str(variant))
+            elif len(variant.children) == 3:
+                # parenthesis
+                if (variant.children[0].nodename == 'OP') and (
+                        variant.children[1].nodename == 'complex_expression') and (
+                        variant.children[2].nodename == 'CP'):
+                    return evaluate_tree(variant.children[1], osmtags)
+                # or
+                elif (variant.children[0].nodename == 'complex_expression') and (
+                        variant.children[1].nodename == 'OR') and (
+                        variant.children[2].nodename == 'complex_expression'):
+                    v1 = evaluate_tree(variant.children[0], osmtags)
+                    v2 = evaluate_tree(variant.children[2], osmtags)
+                    return v1 or v2
+                # and
+                elif (variant.children[0].nodename == 'complex_expression') and (
+                        variant.children[1].nodename == 'AND') and (
+                        variant.children[2].nodename == 'complex_expression'):
+
+                     v1 = evaluate_tree(variant.children[0], osmtags)
+                     v2 = evaluate_tree(variant.children[2], osmtags)
+                     return v1 and v2
+                else:
+                    raise Exception('unexpected node ' + str(variant))
+            else:
+                raise Exception('unexpected node ' + str(variant))
+
+
+        elif variant.nodename == "simple_expression": #it's rather tag comparison expression!
+            if (variant.children[0].nodename == 'TAG') and (variant.children[1].nodename == 'EQ') and (
+                     variant.children[2].nodename == 'VALUE'):
+                strKey = str(variant.children[0].children[0].nodevalue)
+                strValue =str(variant.children[2].children[0].nodevalue)
+                strTagValue= osmtags.get(strKey,'')
+                return strTagValue == strValue
+
+            else:
+                raise Exception('too many or too few elements in comparison/simple_expession')
+        else:
+            for child in variant.children:
+                evaluate_tree(child, osmtags)
+
+
+
+    raise Exception ('no idea how to evaluate note: '+ variant.nodename)
+    #return blnResult
+
 #=================================================================================
 def main():
     #s = "( not amenity=atm ) or ( amenity=bank )"
@@ -425,32 +503,36 @@ def main():
     #s = '--keep-ways="railway=rail"'
     #s = '--keep= --keep-ways="( amenity=atm ) or  ( amenity=bank and atm=yes ) and ( building=bank ) or ( test=test1 )"'
     #s = '--keep= --keep-ways="highway=motorway =trunk =primary =secondary =tertiary  =unclassified =residential =motorway_link =trunk_link =primary_link =secondary_link =tertiary_link =lining_street =service =track =road"'
-    s= '--keep=boundary=administrative and admin_level=7 =8 =9 =10'
+    #s= '--keep=boundary=administrative and admin_level=7 =8 =9 =10'
+    s = '--keep="( amenity=place_of_worship ) and ( amenity=place_of_worship1 )"'
+    osmtags = {"amenity": "place_of_worship"}
     print(s)
 
-    A = parse_filter(s)
+    variant = parse_filter(s, True)
 
     print('parsing result:')
-    for variant in A:
-        print(variant)
-        print(' tokens: ', end='')
-        var_tokens = variant.get_tokens_str()
-        for t in var_tokens:
-            if type(t) is str:
-                print(t, end=' ')
-            else:
-                print(t.value, end=' ')
-        print()
 
-        print("-----------------------------------------")
-        polish = []
-        precompile_parsed_tree(variant, polish)
-        for i in reversed(range (len(polish))):
-                print(polish[i], end=' ')
-        print()
+    print(variant)
+    print(' tokens: ', end='')
+    var_tokens = variant.get_tokens_str()
+    for t in var_tokens:
+        if type(t) is str:
+            print(t, end=' ')
+        else:
+            print(t.value, end=' ')
+    print()
 
-        # variant.print_as_tree()
-        print("-----------------------------------------")
+    print("-----------------------------------------")
+    #polish = []
+    #precompile_parsed_tree(variant, polish)
+    #for i in reversed(range (len(polish))):
+    #        print(polish[i], end=' ')
+    #print()
+
+    print( evaluate_tree(variant, osmtags))
+
+    # variant.print_as_tree()
+    print("-----------------------------------------")
 
 
     print()
