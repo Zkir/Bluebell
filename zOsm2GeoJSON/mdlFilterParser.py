@@ -84,8 +84,7 @@ class SyntaxTreeNode:
 
 
 GRAMMAR = [
-    ['s', ['keep_expression']],
-    ['s', ['keep_expression', 'keep_expression']],
+    ['s', ['keep_expression+']],
     ['keep_expression', ['keep','EQ']],
     ['keep_expression', ['keep','EQ','QUOTE','complex_expression','QUOTE']],
     ['keep_expression', ['keep','EQ','complex_expression']],
@@ -99,11 +98,9 @@ GRAMMAR = [
     ['complex_expression', ['NOT', 'complex_expression']],
     ['complex_expression', ['OP', 'complex_expression', 'CP']],
     ['complex_expression', ['simple_expression']],
-    ['simple_expression', ['TAG', 'EQ']],
-    ['simple_expression', ['TAG', 'EQ', 'VALUE']],
-    ['simple_expression', ['TAG', 'EQ', 'VALUE', 'additional_value']],
-    ['additional_value', ['EQ', 'VALUE']],
-    ['additional_value', ['EQ', 'VALUE','additional_value']],
+    ['simple_expression',  ['TAG', 'EQ']],
+    ['simple_expression',  ['TAG', 'value+']],
+    ['value',              ['EQ',  'VALUE']],
     ['TAG',            [r(r'[\w:]+')]],   #Letters, underscore _ and column :
     ['VALUE',          [r(r'[^()=)]+')]], # Value can be anything, but we will exclude symbols used in this grammar, to make parsing a bit faster.
     ['EQ',             [l('=')]],
@@ -153,9 +150,13 @@ def expand_node(variant, GRAMMAR):
     if len(variant.children) == 0:
         lexeme = variant.nodename
         matching_rules = []
-        for R in GRAMMAR:
-            if (R[0] == lexeme) and (R[0][0].islower()):
-                matching_rules.append(R)
+        if ((type(lexeme) is str) and (lexeme[-1] == '+')):
+            matching_rules.append([lexeme, [lexeme[0:-1]]])
+            matching_rules.append([lexeme, [lexeme[0:-1], lexeme]])
+        else:
+            for R in GRAMMAR:
+                if (R[0] == lexeme) and (R[0][0].islower()):
+                    matching_rules.append(R)
          
         #apply rule     
         if len(matching_rules) > 0:
@@ -433,24 +434,35 @@ def evaluate_tree(variant, osmtags, object_type):
             #TODO: this may be wrong.
 
             for child in variant.children:
-                strKeepType = child.children[0].children[0].nodename
-                if (strKeepType == 'KEEP') or (strKeepType == 'KEEP_NODES' and object_type == "node") or (
-                        strKeepType == 'KEEP_WAYS' and object_type == "way") or (
-                        strKeepType == 'KEEP_RELATIONS' and object_type == "relation"):
-                    blnResult = evaluate_tree(child, osmtags, object_type)
+                blnResult1 = evaluate_tree(child, osmtags, object_type)
+                if not (blnResult1 is None):
+                    blnResult = blnResult1
+
             return blnResult
-
+        elif variant.nodename == 'keep_expression+':
+            blnResult = None
+            for child in variant.children:
+                blnResult1 = evaluate_tree(child, osmtags, object_type)
+                if not (blnResult1 is None):
+                    blnResult = blnResult1
+            return blnResult
         elif variant.nodename == 'keep_expression':
-            #keep_expression contains only one element that should be evaluated.
-            if len(variant.children) == 5:
-                return evaluate_tree(variant.children[3], osmtags, object_type)
-            elif len(variant.children) == 3:
-                return evaluate_tree(variant.children[2], osmtags, object_type)
-            elif len(variant.children) == 2:
-                return False
-            else:
-                raise Exception('too many or too few elements in keep_expression')
+             strKeepType = variant.children[0].children[0].nodename
+             if (strKeepType == 'KEEP') or (strKeepType == 'KEEP_NODES' and object_type == "node") or (
+                    strKeepType == 'KEEP_WAYS' and object_type == "way") or (
+                    strKeepType == 'KEEP_RELATIONS' and object_type == "relation"):
 
+                #keep_expression contains only one element that should be evaluated.
+                if len(variant.children) == 5:
+                    return evaluate_tree(variant.children[3], osmtags, object_type)
+                elif len(variant.children) == 3:
+                    return evaluate_tree(variant.children[2], osmtags, object_type)
+                elif len(variant.children) == 2:
+                    return False
+                else:
+                    raise Exception('too many or too few elements in keep_expression')
+             else:
+                 return None
         elif variant.nodename == "complex_expression":
             if len(variant.children) == 1:
                 if variant.children[0].nodename == 'simple_expression':
@@ -490,20 +502,39 @@ def evaluate_tree(variant, osmtags, object_type):
                 raise Exception('unexpected node ' + str(variant))
 
         elif variant.nodename == "simple_expression": #it's rather tag comparison expression!
-            if (variant.children[0].nodename == 'TAG') and (variant.children[1].nodename == 'EQ') and (
-                     variant.children[2].nodename == 'VALUE'):
-                strKey = str(variant.children[0].children[0].nodevalue)
-                strValue =str(variant.children[2].children[0].nodevalue)
-                strTagValue= osmtags.get(strKey,'')
-                return strTagValue == strValue
+            #if  and (
+            #         variant.children[2].nodename == 'VALUE'):
+            if len(variant.children) == 2:
+                if (variant.children[0].nodename == 'TAG') and (variant.children[1].nodename == 'EQ'):
+                    return True
+                else:
+                    blnResult = False
+                    strKey = str(variant.children[0].children[0].nodevalue)
+                    strTagValue= osmtags.get(strKey,'')
+                    values = evaluate_tree(variant.children[1], osmtags, object_type)
+                    for value in values:
+                        blnResult = blnResult or (strTagValue == value)
+                    return blnResult
 
             else:
                 raise Exception('too many or too few elements in comparison/simple_expession')
+
+        elif variant.nodename =='value+':
+            values = []
+            for child in variant.children:
+                if child.nodename == 'value':
+                    values.append(child.children[1].children[0].nodevalue)
+                elif child.nodename == 'value+':
+                    blnResult1 = evaluate_tree(child, osmtags, object_type)
+                    values = values + blnResult1
+                else:
+                    raise Exception('unexpected node ' + str(child.nodename) + ' in value+ node')
+            return values
+
         else:
-            raise Exception('no idea how to evaluate note: ' + variant.nodename)
+            raise Exception('no idea how to evaluate node: ' + variant.nodename)
             #for child in variant.children:
             #    evaluate_tree(child, osmtags)
-
 
 
     raise Exception ('no idea how to evaluate note: '+ variant.nodename)
@@ -517,7 +548,7 @@ def main():
     #s = '--keep-ways="railway=rail"'
 
     s = '--keep= --keep-ways="highway=motorway =trunk =primary =secondary =tertiary  =unclassified =residential =motorway_link =trunk_link =primary_link =secondary_link =tertiary_link =lining_street =service =track =road"'
-    osmtags = {"highway": "motorway"}
+    osmtags = {"highway": "road"}
     object_type = "way"
     #s= '--keep=boundary=administrative and admin_level=7 =8 =9 =10'
     #s = '--keep="( amenity=place_of_worship ) and ( amenity=place_of_worship1 )"'
