@@ -9,9 +9,12 @@
 define generate_file
 	echo $< $@ 
 	tools\osmfilter.exe 01_countries\$< $(2) -o=02_Interim_osm\$@.osm
-	if not exist "99_Output\$(1)" md 99_Output\$(1)
-	zOsm2GeoJSON\zOsm2GeoJSON.py 02_Interim_osm\$@.osm 99_Output\$(1)\$@.json --action=$(3) $(2)
-	c:\OSGeo4W\bin\ogr2ogr.exe -skipfailures 99_output\$(1)\$@.shp 99_output\$(1)\$@.json	
+	if not exist "90_Output\$(1)" md 90_Output\$(1)
+	zOsm2GeoJSON\zOsm2GeoJSON.py 02_Interim_osm\$@.osm 90_Output\$(1)\$@.json --action=$(3) $(2)
+	c:\OSGeo4W\bin\ogr2ogr.exe -skipfailures 90_Output\$(1)\$@.shp 90_Output\$(1)\$@.json
+        tools\zip_json.bat 90_Output\$(1)\$@.json 91_Output_zipped\$@.json.zip
+        tools\zip_shp.bat  90_Output\$(1)\$@      91_Output_zipped\$@.shp.zip
+	tools\update_ckan.bat 90_Output\$(1)\$@.CKAN.json
 	echo $@
 endef
 
@@ -46,8 +49,8 @@ full_build: tza_tran_rds_ln_s4_osm_pp_roads \
 			tza_phys_riv_ln_s4_osm_pp_rivers \
             tza_tran_can_ln_s4_osm_pp_canals \
             tza_tran_rst_pt_s4_osm_pp_railway_station \
-            tza_shel_eaa_s4_osm_pp_emergency \
-            tza_wash_wts_s4_osm_pp_water_source \
+            tza_shel_eaa_pt_s4_osm_pp_emergency \
+            tza_wash_wts_pt_s4_osm_pp_water_source \
             tza_wash_toi_pt_s4_osm_pp_toilets\
 			tza_elev_cst_ln_s4_osm_pp_coastline \
 			tza_tran_air_pt_s4_osm_pp_airports \
@@ -55,7 +58,8 @@ full_build: tza_tran_rds_ln_s4_osm_pp_roads \
             tza_admn_ad1_py_s4_osm_pp_adminboundary1 \
             tza_admn_ad2_py_s4_osm_pp_adminboundary2 \
             tza_admn_ad3_py_s4_osm_pp_adminboundary3 \
-            tza_bldg_bdg_py_s4_osm_pp_buildings
+
+#            tza_bldg_bdg_py_s4_osm_pp_buildings
 			
 	echo All targets completed OK
 
@@ -198,11 +202,11 @@ tza_tran_rst_pt_s4_osm_pp_railway_station: tanzania-latest.o5m
 	$(call generate_file,232_tran, --keep="railway=station =halt ",write_poi)
 
 #emergency 
-tza_shel_eaa_s4_osm_pp_emergency: tanzania-latest.o5m 
+tza_shel_eaa_pt_s4_osm_pp_emergency: tanzania-latest.o5m 
 	$(call generate_file,228_shel, --keep="emergency=assembly_point",write_poi)
 
 #water source 
-tza_wash_wts_s4_osm_pp_water_source: tanzania-latest.o5m 
+tza_wash_wts_pt_s4_osm_pp_water_source: tanzania-latest.o5m 
 	$(call generate_file,234_wash, --keep="amenity=drinking_water or drinking_water=yes ",write_poi)
 
 #toilets

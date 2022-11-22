@@ -13,29 +13,95 @@ def escapeJsonString(s):
     s = s.replace("'","")
     s = s.replace("\\","\\\\") # single \ to double \\
     return s
-    
+
+
 #most uncertain part, we need to create parcer for osmfilter filter!     
 def evaluateFilter(object_filter, osmtags,object_type):
     blnResult = evaluate_tree(object_filter, osmtags, object_type)
     return blnResult
 
-def writeGeoJson(Objects, objOsmGeom, strOutputFile, strAction, allowed_tags):
+
+iso3166={'tza':'Tanzania'}
+def writeCKANJson(Objects, objOsmGeom, strOutputFileName, strAction, allowed_tags, strFilter):
+    path, fname = os.path.split(strOutputFileName)
+
+    dataset_name = fname[0:-5]
+    dataset_title = iso3166[fname[0:3]] + ' ' + fname[26:-5].upper()
+    dataset_description = 'This dataset contains ' + dataset_title + \
+                          ', extracted from OpenStreetMap. There are ' + str( len(Objects)) + ' objects.' +  \
+                          'Original filter is ' + strFilter
+
+    #it's not a json escaping, but  a particularly perverted bug of curl, it does not undertand equal sign
+    dataset_description = dataset_description.replace("=", '%3D')
+
+    geoextent = fname[0:3]
+    category = fname[4:8]
+    theme = fname[9:12]
+    geometry_type = fname[13:15]
+    scale = fname[16:18]
+    permission = fname[23:25]
+
+    strOutputFileName = os.path.join(path, dataset_name + '.CKAN.json')
+    fo = open(strOutputFileName, 'w', encoding="utf-8")
+
+    fo.write('{ \n')
+    fo.write('    "name": "' + escapeJsonString(dataset_name) + '",\n')
+    fo.write('    "title": "' + escapeJsonString(dataset_title) + '",\n')
+    fo.write('    "notes": "' + escapeJsonString(dataset_description) + '",\n')
+    fo.write('    "url": "Openstreetmap.org",\n')
+    fo.write('    "owner_org": "kontur",\n')
+    fo.write('    "tags": [{"vocabulary_id": null,  "display_name": "'+escapeJsonString(geoextent)+'",  "name": "' + escapeJsonString(geoextent)+'"},\n')
+    fo.write('             {"vocabulary_id": null,  "display_name": "'+escapeJsonString(category)+'",  "name": "' + escapeJsonString(category)+'"},\n')
+    fo.write('             {"vocabulary_id": null,  "display_name": "osm",  "name": "osm"}], \n')
+    #fo.write('    "generation_date" : "' + escapeJsonString(datetime.now().strftime("%Y-%m-%dT%H:%M:%S")) + '", \n')
+    #fo.write('    "number_of_objects": "' + str(len(Objects)) + '",\n')
+    #fo.write('    "last_known_edit_date": "YYYY-MM-DD",\n')
+    fo.write('    "extras": [ {"key":"geoextent", "value":"' + escapeJsonString(geoextent) + '"},\n')
+    fo.write('             {"key":"category", "value":"' + escapeJsonString(category) + '"},\n')
+    fo.write('             {"key":"theme", "value":"' + escapeJsonString(theme) + '"}, \n')
+    fo.write('             {"key":"geometry_type", "value":"' + escapeJsonString(geometry_type) + '"},\n')
+    fo.write('             {"key":"scale", "value":"' + escapeJsonString(scale) + '"},\n')
+    fo.write('             {"key":"source", "value":"OSM"},\n')
+    fo.write('             {"key":"permission", "value":"' + escapeJsonString(permission) + '"} ],\n')
+
+    fo.write('    "resources": [\n')
+    fo.write('        {"name":"'+escapeJsonString(dataset_title)+' in GeoJson format",\n')
+    fo.write('         "url":"https://somestorage.org/'+escapeJsonString(dataset_name)+'.json.zip",\n')
+    fo.write('         "format": "GeoJson"\n')
+    fo.write('        },')
+    fo.write('        {"name":"'+escapeJsonString(dataset_title)+' as ESRI shape",\n')
+    fo.write('         "url":"https://somestorage.org/'+escapeJsonString(dataset_name)+'.shp.zip",\n')
+    fo.write('         "format": "ESRI shape"\n')
+    fo.write('        }]\n')
+
+    fo.write('} \n')
+    fo.close()
+
+
+def writeGeoJson(Objects, objOsmGeom, strOutputFile, strAction, allowed_tags, strFilter):
     
     fo = open(strOutputFile, 'w', encoding="utf-8")
     fname = os.path.basename(strOutputFile)
+    dataset_name = (fname[0:3] + ' ' + fname[26:-5]).upper()
+    dataset_description = 'This dataset contains '+ fname[0:3].upper()  + ' ' + fname[26:-5].upper()  +'. There are '+str(len(Objects))+' objects. ' + \
+                            'Original filter is '+ strFilter
 
     fo.write('{ \n') 
     fo.write('    "type": "FeatureCollection",\n')
-    #fo.write('    "generator" : "bluebell-zOsm2GeoJSON",\n')
-    #fo.write('    "generation_date" : "' + escapeJsonString(datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))+'", \n')
-    #fo.write('    "last_known_edit_date": "YYYY-MM-DD",\n')
-    #fo.write('    "geoextent": "'+escapeJsonString(fname[0:3])+'",\n')
-    #fo.write('    "category": "'+escapeJsonString(fname[4:8])+'",\n')
-    #fo.write('    "theme": "'+escapeJsonString(fname[9:12])+'",\n')
-    #fo.write('    "geometry_type": "'+escapeJsonString(fname[13:15])+'",\n')
-    #fo.write('    "scale": "'+escapeJsonString(fname[16:18])+'",\n')
-    #fo.write('    "source": "OpenStreetMap",\n')
-    #fo.write('    "permission": "'+escapeJsonString(fname[23:25])+'",\n')
+    fo.write('    "generator" : "bluebell-zOsm2GeoJSON",\n')
+    fo.write('    "generation_date" : "' + escapeJsonString(datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))+'", \n')
+    fo.write('    "number_of_objects": "'+str(len(Objects))+'",\n')
+    fo.write('    "last_known_edit_date": "YYYY-MM-DD",\n')
+    fo.write('    "dataset_title": "' + escapeJsonString(dataset_name) + '",\n')
+    fo.write('    "dataset_notes": "' + escapeJsonString(dataset_description) + '",\n')
+
+    fo.write('    "geoextent": "' + escapeJsonString(fname[0:3]) + '",\n')
+    fo.write('    "category": "'+escapeJsonString(fname[4:8])+'",\n')
+    fo.write('    "theme": "'+escapeJsonString(fname[9:12])+'",\n')
+    fo.write('    "geometry_type": "'+escapeJsonString(fname[13:15])+'",\n')
+    fo.write('    "scale": "'+escapeJsonString(fname[16:18])+'",\n')
+    fo.write('    "source": "OpenStreetMap",\n')
+    fo.write('    "permission": "'+escapeJsonString(fname[23:25])+'",\n')
     fo.write('    "features": [\n')
 
     j=0
@@ -226,8 +292,9 @@ def createJson(strInputOsmFile, strOutputFileName,strAction,strFilter):
     SelectedObjects = filterObjects(Objects, object_filter, strAction)
 
     allowed_tags = writeTagStatistics(strOutputFileName+'.stat.txt',SelectedObjects)
-    
-    writeGeoJson(SelectedObjects, objOsmGeom, strOutputFileName, strAction, allowed_tags)  #see former   processBuildings()
+
+    writeGeoJson(SelectedObjects, objOsmGeom, strOutputFileName, strAction, allowed_tags, strFilter)
+    writeCKANJson(SelectedObjects, objOsmGeom, strOutputFileName, strAction, allowed_tags, strFilter)
 
 
     t2 = time.time()
