@@ -2,6 +2,9 @@
 __pycache__/*.*
 zOsm2GeoJSON/__pycache__/*.*
 00_Planet/osmupdate_temp
+00_Planet/planet-latest.osm.pbf
+00_Planet/planet.osm.pbf
+00_Planet/update.bat
 01_Countries/1.bat
 01_Countries/*.pbf
 01_Countries/*.o5m
@@ -13,7 +16,7 @@ zOsm2GeoJSON/__pycache__/*.*
 90_Output/**/*.shx
 90_Output/**/*.prj
 90_Output/**/*.stat.txt
-
+91_Output_zipped/*.zip
 /antlr-based/
 zOsm2GeoJSON/test.py
 
@@ -22,7 +25,7 @@ tools/ckan.py
 tools/kzip.exe
 tools/curl
 tools/curl1
-00_Planet/planet-latest.osm.pbf
-00_Planet/planet.osm.pbf
-00_Planet/update.bat
 tools/.wget-hsts
+
+key.txt
+tools/update_ckan.bat

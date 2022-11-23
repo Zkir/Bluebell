@@ -14,6 +14,8 @@ define generate_file
 	c:\OSGeo4W\bin\ogr2ogr.exe -skipfailures 90_Output\$(1)\$@.shp 90_Output\$(1)\$@.json
         tools\zip_json.bat 90_Output\$(1)\$@.json 91_Output_zipped\$@.json.zip
         tools\zip_shp.bat  90_Output\$(1)\$@      91_Output_zipped\$@.shp.zip
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 91_Output_zipped\$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 91_Output_zipped\$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
 	tools\update_ckan.bat 90_Output\$(1)\$@.CKAN.json
 	echo $@
 endef
@@ -239,4 +241,14 @@ tza_tran_air_pt_s4_osm_pp_airports: tanzania-latest.o5m
 
 tanzania-latest.o5m:
 	echo just assume that the county file is present
-  
+
+tza.o5m:
+	
+ifneq ("$(wildcard 01_countries\tza.o5m)","")
+	del 01_countries\tza_old.o5m
+	ren 01_countries\tza.o5m tza_old.o5m
+	osmupdate64 01_countries\tza_old.o5m 01_countries\tza.o5m -B=poly\tza.poly -v
+else
+	osmconvert 00_Planet\planet-latest.osm.pbf -B=poly\tza.poly -o=01_countries\tza.o5m
+endif
+
