@@ -43,6 +43,8 @@ class T3DObject:
         self.bbox.maxLat = 0
         self.bbox.maxLon = 0
 
+        self.timestamp = ""
+
     def getTag(self ,strKey):
         return self.osmtags.get(strKey,'')
 
@@ -76,6 +78,7 @@ def readOsmXml(strSrcOsmFile):
             osmObject = T3DObject()
             osmObject.type = strTag
             osmObject.id = objXML.GetAttribute('id')
+            osmObject.timestamp = objXML.GetAttribute('timestamp')
             blnObjectIncomplete= False
 
         if strTag == 'node':

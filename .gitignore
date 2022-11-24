@@ -29,3 +29,5 @@ tools/.wget-hsts
 
 key.txt
 tools/update_ckan.bat
+01_Countries/tza.o5m.bak
+tools/ckan_test.bat
