@@ -7,21 +7,31 @@
 # feature.json --> feature.shp: ogr2ogr 
 
 define generate_file
+	status.py "started" "$@"
 	tools\osmfilter.exe 01_countries\$< $(2) -o=02_Interim_osm\$@.osm
 	if not exist "90_Output\$(1)" md 90_Output\$(1)
 	zOsm2GeoJSON\zOsm2GeoJSON.py 02_Interim_osm\$@.osm 90_Output\$(1)\$@.json --action=$(3) $(2)
-	c:\OSGeo4W\bin\ogr2ogr.exe -skipfailures 90_Output\$(1)\$@.shp 90_Output\$(1)\$@.json
+	c:\OSGeo4W\bin\ogr2ogr.exe  -lco ENCODING=UTF8 -skipfailures 90_Output\$(1)\$@.shp 90_Output\$(1)\$@.json
         tools\zip_json.bat 90_Output\$(1)\$@.json 91_Output_zipped\$@.json.zip
         tools\zip_shp.bat  90_Output\$(1)\$@      91_Output_zipped\$@.shp.zip
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 91_Output_zipped\$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 91_Output_zipped\$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
 	tools\update_ckan.bat 90_Output\$(1)\$@.CKAN.json
+	status.py "completed" "$@"
 	echo $@ completed
 endef
 
+tza_cmf: country_datasets
+	status.py "started" "$@"
+	tools\zip_cmf_json.bat 90_Output 92_Output_cmf_zipped\$@_json.zip	
+	tools\zip_cmf_shp.bat  90_Output 92_Output_cmf_zipped\$@_shp.zip
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 92_Output_cmf_zipped\$@_json.zip s3://mekillot-backet/cmfs/$@_json.zip
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 92_Output_cmf_zipped\$@_shp.zip  s3://mekillot-backet/cmfs/$@_shp.zip	
+	tools\update_ckan.bat 92_Output_cmf_zipped\$@.CKAN.json
+	status.py "completed" "$@"
 
-full_build: tza_tran_rds_ln_s4_osm_pp_roads \
-            tza_tran_rds_ln_s4_osm_pp_mainroads \
+country_datasets: tza_tran_rds_ln_s4_osm_pp_mainroads \
+            tza_tran_rds_ln_s4_osm_pp_roads \
             tza_tran_rrd_ln_s4_osm_pp_railways \
             tza_tran_rrd_ln_s4_osm_pp_subwaytram \
             tza_phys_dam_pt_s4_osm_pp_dam \
@@ -62,7 +72,7 @@ full_build: tza_tran_rds_ln_s4_osm_pp_roads \
 
 #            tza_bldg_bdg_py_s4_osm_pp_buildings
 			
-	echo All targets completed OK
+	echo All layers completed OK
 
 
 #roads	
@@ -251,3 +261,4 @@ else
 	osmconvert 00_Planet\planet-latest.osm.pbf --complete-ways --complete-multipolygons -B=poly\tza.poly -o=01_countries\tza.o5m
 endif
 	echo $@  completed
+

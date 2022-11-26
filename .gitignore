@@ -15,8 +15,12 @@ zOsm2GeoJSON/__pycache__/*.*
 90_Output/**/*.dbf
 90_Output/**/*.shx
 90_Output/**/*.prj
+90_Output/**/*.cpg
 90_Output/**/*.stat.txt
 91_Output_zipped/*.zip
+92_Output_cmf_zipped/*.zip
+92_Output_cmf_zipped/*.CKAN.json
+
 /antlr-based/
 zOsm2GeoJSON/test.py
 
@@ -31,3 +35,5 @@ key.txt
 tools/update_ckan.bat
 01_Countries/tza.o5m.bak
 tools/ckan_test.bat
+99_WebUI/status.dat
+99_WebUI/index.html
