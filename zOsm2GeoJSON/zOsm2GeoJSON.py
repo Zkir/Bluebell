@@ -6,14 +6,20 @@ import os
 from mdlOsmParser import readOsmXml, encodeXmlString
 from mdlFilterParser import parse_filter
 from mdlFilterParser import evaluate_tree
+from ma_dictionaries import Geoextent
+from ma_dictionaries import FeatureCategory
 
 
 def escapeJsonString(s):
-    s = s.replace("\"","" )
+    s = s.replace("\"", "")
     s = s.replace("'","")
     s = s.replace("\\","\\\\") # single \ to double \\
     return s
 
+def format_tag(s):
+    s = s.replace(" ", "_")
+    s = s.replace("/", "_")
+    return s.lower()
 
 #most uncertain part, we need to create parcer for osmfilter filter!     
 def evaluateFilter(object_filter, osmtags,object_type):
@@ -21,25 +27,27 @@ def evaluateFilter(object_filter, osmtags,object_type):
     return blnResult
 
 
-iso3166={'tza':'Tanzania'}
 def writeCKANJson(Objects, objOsmGeom, strOutputFileName, strAction, allowed_tags, strFilter, last_known_edit):
     path, fname = os.path.split(strOutputFileName)
-
-    dataset_name = fname[0:-5]
-    dataset_title = iso3166[fname[0:3]] + ' ' + fname[26:-5].upper()
-    dataset_description = 'This dataset contains ' + dataset_title + \
-                          ', extracted from OpenStreetMap. There are ' + str( len(Objects)) + ' objects. ' +  \
-                          'Original filter is ' + strFilter + '. Last known edit timestamp: ' + last_known_edit
-
-    #it's not a json escaping, but  a particularly perverted bug of curl, it does not undertand equal sign
-    dataset_description = dataset_description.replace("=", '%3D')
-
+    dataset_name = fname[0:-5] #this file name without extention
     geoextent = fname[0:3]
     category = fname[4:8]
     theme = fname[9:12]
     geometry_type = fname[13:15]
     scale = fname[16:18]
     permission = fname[23:25]
+    dataset_hum_name = fname[26:-5]
+
+
+    short_geoextent = Geoextent[geoextent]
+    # dataset_title = geoextent.upper() + ' ' + dataset_hum_name.upper()
+    dataset_title =  dataset_hum_name.upper() + ' -- ' + short_geoextent
+    dataset_description = 'This dataset contains ' + dataset_hum_name.upper() + \
+                          ', extracted from OpenStreetMap for ' + short_geoextent + '. There are ' + str( len(Objects)) + ' objects. ' +  \
+                          'Original filter is ' + strFilter + '. Last known edit timestamp: ' + last_known_edit
+
+    #it's not a json escaping, but  a particularly perverted bug of curl, it does not undertand equal sign
+    dataset_description = dataset_description.replace("=", '%3D')
 
     strOutputFileName = os.path.join(path, dataset_name + '.CKAN.json')
     fo = open(strOutputFileName, 'w', encoding="utf-8")
@@ -51,20 +59,22 @@ def writeCKANJson(Objects, objOsmGeom, strOutputFileName, strAction, allowed_tag
     fo.write('    "url": "Openstreetmap.org",\n')
     fo.write('    "owner_org": "kontur",\n')
     fo.write('    "license_id": "odc-odbl",\n')
-    fo.write('    "tags": [{"vocabulary_id": null,  "display_name": "'+escapeJsonString(geoextent)+'",  "name": "' + escapeJsonString(geoextent)+'"},\n')
-    fo.write('             {"vocabulary_id": null,  "display_name": "'+escapeJsonString(category)+'",  "name": "' + escapeJsonString(category)+'"},\n')
+
+    fo.write('    "tags": [ \n')
+    fo.write('             {"vocabulary_id": null,  "display_name": "'+escapeJsonString(FeatureCategory[category])+'",  "name": "' + escapeJsonString(format_tag(FeatureCategory[category]))+'"},\n')
     fo.write('             {"vocabulary_id": null,  "display_name": "osm",  "name": "osm"}], \n')
-    #fo.write('    "generation_date" : "' + escapeJsonString(datetime.now().strftime("%Y-%m-%dT%H:%M:%S")) + '", \n')
-    #fo.write('    "number_of_objects": "' + str(len(Objects)) + '",\n')
-    #fo.write('    "last_known_edit_date": "YYYY-MM-DD",\n')
+
+    fo.write('    "groups": [{"name": "' + escapeJsonString(geoextent)+'"}\n')
+    fo.write('              ], \n')
+
     fo.write('    "extras": [ \n')
-    fo.write('             {"key": "last_known_edit_date", "value": "' + escapeJsonString(last_known_edit) + '"},\n')
+    fo.write('             {"key": "last_known_edit", "value": "' + escapeJsonString(last_known_edit) + '"},\n')
     fo.write('             {"key": "geoextent",            "value": "' + escapeJsonString(geoextent) + '"},\n')
     fo.write('             {"key": "category",             "value": "' + escapeJsonString(category) + '"},\n')
     fo.write('             {"key": "theme",                "value": "' + escapeJsonString(theme) + '"}, \n')
     fo.write('             {"key": "geometry_type",        "value": "' + escapeJsonString(geometry_type) + '"},\n')
     fo.write('             {"key": "scale",                "value": "' + escapeJsonString(scale) + '"},\n')
-    fo.write('             {"key": "source",               "value": "OSM"},\n')
+    fo.write('             {"key": "source",               "value": "osm"},\n')
     fo.write('             {"key": "permission",           "value": "' + escapeJsonString(permission) + '"} ],\n')
 
     fo.write('    "resources": [\n')

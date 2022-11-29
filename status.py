@@ -2,24 +2,27 @@ import time
 import sys
 from datetime import datetime
 import os
+import os.path
+
 #====================================================================================
 # home-brew relational DB interface
 # plain files pipe (|) separated
 #====================================================================================
 def loadDatFile(strInputFile, encoding="utf-8"):
     cells = []
-    filehandle = open(strInputFile, 'r', encoding=encoding)
-    txt = filehandle.readline().strip()
-    while len(txt) != 0:
-        if txt[0:1] != "#":
-            row = txt.strip().split("|")
-            for i in range(len(row)):
-                row[i] = row[i].strip()
-            if len(row)>1:
-                cells.append(row)
-        txt = filehandle.readline()
-    # end of while
-    filehandle.close()
+    if os.path.exists(strInputFile):
+        filehandle = open(strInputFile, 'r', encoding=encoding)
+        txt = filehandle.readline().strip()
+        while len(txt) != 0:
+            if txt[0:1] != "#":
+                row = txt.strip().split("|")
+                for i in range(len(row)):
+                    row[i] = row[i].strip()
+                if len(row)>1:
+                    cells.append(row)
+            txt = filehandle.readline()
+        # end of while
+        filehandle.close()
     return cells
 
 def saveDatFile(cells,strOutputFile):
@@ -39,10 +42,23 @@ def print_html(strOutputFile,tblStatus1):
     tblStatus = sorted(tblStatus1, key = lambda record : record[2],reverse=True)
      
     pipeline_status='Idle' 
+    n_targets_in_progress = 0
+    n_targets_frozen = 0
+    n_targets_failed = 0
+    oldest_completed = ''
+
     for record in tblStatus:
         if record[1] == "started":
             pipeline_status='Up and Running'
-            break  
+            n_targets_in_progress = n_targets_in_progress + 1  
+        elif record[1] == "failed":
+            n_targets_failed = n_targets_failed + 1
+        elif record[1] == "completed":
+            if oldest_completed == '':
+                oldest_completed = record[2]
+            elif oldest_completed>record[2]:
+                oldest_completed = record[2]
+
 
     fo = open(strOutputFile, 'w', encoding="utf-8")
     fo.write('<html>\n')
@@ -65,7 +81,23 @@ def print_html(strOutputFile,tblStatus1):
     fo.write('<table>\n')
     fo.write('    <tr>\n')
     fo.write('        <td><b>Pipeline Status</b></td>\n')
-    fo.write('        <td><b>'+ pipeline_status+ '</b></td>\n')
+    fo.write('        <td align="center"><b>'+ pipeline_status+ '</b></td>\n')
+    fo.write('    </tr>\n')
+    fo.write('    <tr>\n')
+    fo.write('        <td>Targets in progress</td>\n')
+    fo.write('        <td align="center">'+ str(n_targets_in_progress)+ '</b></td>\n')
+    fo.write('    </tr>\n')
+    fo.write('    <tr>\n')
+    fo.write('        <td>Targets frozen</td>\n')
+    fo.write('        <td align="center">'+ str(n_targets_frozen) + '</td>\n')
+    fo.write('    </tr>\n')
+    fo.write('    <tr>\n')
+    fo.write('        <td>Targets failed</td>\n')
+    fo.write('        <td align="center">'+ str(n_targets_failed) + '</td>\n')
+    fo.write('    </tr>\n')
+    fo.write('    <tr>\n')
+    fo.write('        <td>Oldest completed target</td>\n')
+    fo.write('        <td align="center">'+ oldest_completed.replace('T', ' ') + '</td>\n')
     fo.write('    </tr>\n')
     fo.write('</table>\n')
     fo.write('<h3>Target statuses</h3>\n')
