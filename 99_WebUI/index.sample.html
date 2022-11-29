@@ -1,0 +1,529 @@
+<html>
+<head>
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }     th, td {
+        padding: 15px;
+    }
+    tr.started {
+        background-color: yellow; 
+    }
+</style>
+</head>
+<body>
+<h1>Bluebell Pipeline Dashboard</h1>
+<table>
+    <tr>
+        <td><b>Pipeline Status</b></td>
+        <td align="center"><b>Idle</b></td>
+    </tr>
+    <tr>
+        <td>Targets in progress</td>
+        <td align="center">0</b></td>
+    </tr>
+    <tr>
+        <td>Targets frozen</td>
+        <td align="center">0</td>
+    </tr>
+    <tr>
+        <td>Targets failed</td>
+        <td align="center">0</td>
+    </tr>
+    <tr>
+        <td>Oldest completed target</td>
+        <td align="center">2022-11-27 15:40:54</td>
+    </tr>
+</table>
+<h3>Target statuses</h3>
+<table>
+    <tr>
+        <th>Target name</th>
+        <th>Status</th>
+        <th>Status date</th>
+        <th>Duration</th>
+      </tr>
+      <tr class="completed">
+        <td>blr_cmf</td>
+        <td>completed</td>
+        <td>2022-11-28 17:31:07</td>
+        <td>0:01:34.366987</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_admn_ad3_py_s4_osm_pp_adminboundary3</td>
+        <td>completed</td>
+        <td>2022-11-28 17:29:33</td>
+        <td>0:00:40.321074</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_admn_ad2_py_s4_osm_pp_adminboundary2</td>
+        <td>completed</td>
+        <td>2022-11-28 17:28:53</td>
+        <td>0:00:13.567741</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_admn_ad1_py_s4_osm_pp_adminboundary1</td>
+        <td>completed</td>
+        <td>2022-11-28 17:28:40</td>
+        <td>0:00:11.331818</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_admn_ad0_py_s4_osm_pp_adminboundary0</td>
+        <td>completed</td>
+        <td>2022-11-28 17:28:28</td>
+        <td>0:00:11.998736</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_tran_air_pt_s4_osm_pp_airports</td>
+        <td>completed</td>
+        <td>2022-11-28 17:28:16</td>
+        <td>0:00:06.880086</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_elev_cst_ln_s4_osm_pp_coastline</td>
+        <td>completed</td>
+        <td>2022-11-28 17:28:10</td>
+        <td>0:00:06.727660</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_wash_toi_pt_s4_osm_pp_toilets</td>
+        <td>completed</td>
+        <td>2022-11-28 17:28:04</td>
+        <td>0:00:06.659912</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_wash_wts_pt_s4_osm_pp_water_source</td>
+        <td>completed</td>
+        <td>2022-11-28 17:27:58</td>
+        <td>0:00:07.354697</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_shel_eaa_pt_s4_osm_pp_emergency</td>
+        <td>completed</td>
+        <td>2022-11-28 17:27:51</td>
+        <td>0:00:06.778493</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_tran_rst_pt_s4_osm_pp_railway_station</td>
+        <td>completed</td>
+        <td>2022-11-28 17:27:45</td>
+        <td>0:00:06.656897</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_tran_can_ln_s4_osm_pp_canals</td>
+        <td>completed</td>
+        <td>2022-11-28 17:27:39</td>
+        <td>0:00:08.342842</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_phys_riv_ln_s4_osm_pp_rivers</td>
+        <td>completed</td>
+        <td>2022-11-28 17:27:31</td>
+        <td>0:00:34.081452</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_phys_lak_py_s4_osm_pp_natural_water</td>
+        <td>completed</td>
+        <td>2022-11-28 17:26:56</td>
+        <td>0:00:57.920499</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_util_mil_py_s4_osm_pp_militaryinstallation</td>
+        <td>completed</td>
+        <td>2022-11-28 17:25:59</td>
+        <td>0:00:07.284686</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_util_pst_pt_s4_osm_pp_substation</td>
+        <td>completed</td>
+        <td>2022-11-28 17:25:52</td>
+        <td>0:00:08.261178</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_util_pst_pt_s4_osm_pp_powerstation</td>
+        <td>completed</td>
+        <td>2022-11-28 17:25:44</td>
+        <td>0:00:06.449556</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_util_pwl_ln_s4_osm_pp_powerline</td>
+        <td>completed</td>
+        <td>2022-11-28 17:25:38</td>
+        <td>0:00:12.280237</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_util_ppl_ln_s4_osm_pp_pipeline</td>
+        <td>completed</td>
+        <td>2022-11-28 17:25:26</td>
+        <td>0:00:07.519643</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_tran_brg_pt_s4_osm_pp_bridges</td>
+        <td>completed</td>
+        <td>2022-11-28 17:25:19</td>
+        <td>0:00:06.521266</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_stle_stl_pt_s4_osm_pp_townscities</td>
+        <td>completed</td>
+        <td>2022-11-28 17:25:13</td>
+        <td>0:00:07.251636</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_stle_stl_pt_s4_osm_pp_settlements</td>
+        <td>completed</td>
+        <td>2022-11-28 17:25:06</td>
+        <td>0:00:24.424952</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_pois_bor_pt_s4_osm_pp_border_control</td>
+        <td>completed</td>
+        <td>2022-11-28 17:24:42</td>
+        <td>0:00:07.031587</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_cccm_ref_pt_s4_osm_pp_refugee_site</td>
+        <td>completed</td>
+        <td>2022-11-28 17:24:35</td>
+        <td>0:00:06.474527</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_pois_rel_pt_s4_osm_pp_place_of_worship</td>
+        <td>completed</td>
+        <td>2022-11-28 17:24:29</td>
+        <td>0:00:07.263171</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_cash_mkt_pt_s4_osm_pp_marketplace</td>
+        <td>completed</td>
+        <td>2022-11-28 17:24:22</td>
+        <td>0:00:06.182281</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_heal_hos_pt_s4_osm_pp_hospitals</td>
+        <td>completed</td>
+        <td>2022-11-28 17:24:15</td>
+        <td>0:00:06.949370</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_heal_hea_pt_s4_osm_pp_health_facilities</td>
+        <td>completed</td>
+        <td>2022-11-28 17:24:09</td>
+        <td>0:00:08.544190</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_cash_atm_pt_s4_osm_pp_atm</td>
+        <td>completed</td>
+        <td>2022-11-28 17:24:01</td>
+        <td>0:00:07.504672</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_cash_bnk_pt_s4_osm_pp_banks</td>
+        <td>completed</td>
+        <td>2022-11-28 17:23:54</td>
+        <td>0:00:07.086020</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_tran_por_pt_s4_osm_pp_port</td>
+        <td>completed</td>
+        <td>2022-11-28 17:23:47</td>
+        <td>0:00:06.374929</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_tran_fer_ln_s4_osm_pp_ferry_route</td>
+        <td>completed</td>
+        <td>2022-11-28 17:23:41</td>
+        <td>0:00:07.032176</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_tran_fte_pt_s4_osm_pp_ferry_terminal</td>
+        <td>completed</td>
+        <td>2022-11-28 17:23:34</td>
+        <td>0:00:06.840127</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_educ_uni_pt_s4_osm_pp_university</td>
+        <td>completed</td>
+        <td>2022-11-28 17:23:28</td>
+        <td>0:00:06.559572</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_educ_edu_pt_s4_osm_pp_school</td>
+        <td>completed</td>
+        <td>2022-11-28 17:23:22</td>
+        <td>0:00:08.058952</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_phys_dam_pt_s4_osm_pp_dam</td>
+        <td>completed</td>
+        <td>2022-11-28 17:23:14</td>
+        <td>0:00:06.791040</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_tran_rrd_ln_s4_osm_pp_subwaytram</td>
+        <td>completed</td>
+        <td>2022-11-28 17:23:08</td>
+        <td>0:00:06.800383</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_tran_rrd_ln_s4_osm_pp_railways</td>
+        <td>completed</td>
+        <td>2022-11-28 17:23:02</td>
+        <td>0:00:11.477367</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_tran_rds_ln_s4_osm_pp_roads</td>
+        <td>completed</td>
+        <td>2022-11-28 17:22:51</td>
+        <td>0:02:58.352097</td>
+      </tr>
+      <tr class="completed">
+        <td>blr_tran_rds_ln_s4_osm_pp_mainroads</td>
+        <td>completed</td>
+        <td>2022-11-28 17:19:53</td>
+        <td>0:00:43.544794</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_wash_toi_pt_s4_osm_pp_toilets</td>
+        <td>completed</td>
+        <td>2022-11-27 16:18:19</td>
+        <td>0:00:10.468237</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_cmf</td>
+        <td>completed</td>
+        <td>2022-11-27 15:59:32</td>
+        <td>0:02:30.025125</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_admn_ad3_py_s4_osm_pp_adminboundary3</td>
+        <td>completed</td>
+        <td>2022-11-27 15:57:02</td>
+        <td>0:00:14.519955</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_admn_ad2_py_s4_osm_pp_adminboundary2</td>
+        <td>completed</td>
+        <td>2022-11-27 15:56:48</td>
+        <td>0:00:10.357906</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_admn_ad1_py_s4_osm_pp_adminboundary1</td>
+        <td>completed</td>
+        <td>2022-11-27 15:56:38</td>
+        <td>0:00:20.369879</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_admn_ad0_py_s4_osm_pp_adminboundary0</td>
+        <td>completed</td>
+        <td>2022-11-27 15:56:18</td>
+        <td>0:00:15.491508</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_tran_air_pt_s4_osm_pp_airports</td>
+        <td>completed</td>
+        <td>2022-11-27 15:56:03</td>
+        <td>0:00:09.797730</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_elev_cst_ln_s4_osm_pp_coastline</td>
+        <td>completed</td>
+        <td>2022-11-27 15:55:54</td>
+        <td>0:00:16.075486</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_wash_wts_pt_s4_osm_pp_water_source</td>
+        <td>completed</td>
+        <td>2022-11-27 15:55:28</td>
+        <td>0:00:10.637803</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_shel_eaa_pt_s4_osm_pp_emergency</td>
+        <td>completed</td>
+        <td>2022-11-27 15:55:18</td>
+        <td>0:00:09.494282</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_tran_rst_pt_s4_osm_pp_railway_station</td>
+        <td>completed</td>
+        <td>2022-11-27 15:55:08</td>
+        <td>0:00:09.949346</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_tran_can_ln_s4_osm_pp_canals</td>
+        <td>completed</td>
+        <td>2022-11-27 15:54:58</td>
+        <td>0:00:09.990712</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_phys_riv_ln_s4_osm_pp_rivers</td>
+        <td>completed</td>
+        <td>2022-11-27 15:54:49</td>
+        <td>0:00:25.132568</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_phys_lak_py_s4_osm_pp_natural_water</td>
+        <td>completed</td>
+        <td>2022-11-27 15:54:24</td>
+        <td>0:00:38.454436</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_util_mil_py_s4_osm_pp_militaryinstallation</td>
+        <td>completed</td>
+        <td>2022-11-27 15:53:46</td>
+        <td>0:00:10.564269</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_util_pst_pt_s4_osm_pp_substation</td>
+        <td>completed</td>
+        <td>2022-11-27 15:53:36</td>
+        <td>0:00:09.492055</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_util_pst_pt_s4_osm_pp_powerstation</td>
+        <td>completed</td>
+        <td>2022-11-27 15:53:26</td>
+        <td>0:00:10.887739</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_util_pwl_ln_s4_osm_pp_powerline</td>
+        <td>completed</td>
+        <td>2022-11-27 15:53:16</td>
+        <td>0:00:10.548337</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_util_ppl_ln_s4_osm_pp_pipeline</td>
+        <td>completed</td>
+        <td>2022-11-27 15:53:06</td>
+        <td>0:00:09.447648</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_tran_brg_pt_s4_osm_pp_bridges</td>
+        <td>completed</td>
+        <td>2022-11-27 15:52:56</td>
+        <td>0:00:10.899576</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_stle_stl_pt_s4_osm_pp_townscities</td>
+        <td>completed</td>
+        <td>2022-11-27 15:52:46</td>
+        <td>0:00:10.676794</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_stle_stl_pt_s4_osm_pp_settlements</td>
+        <td>completed</td>
+        <td>2022-11-27 15:52:36</td>
+        <td>0:00:11.611628</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_pois_bor_pt_s4_osm_pp_border_control</td>
+        <td>completed</td>
+        <td>2022-11-27 15:52:25</td>
+        <td>0:00:10.090482</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_cccm_ref_pt_s4_osm_pp_refugee_site</td>
+        <td>completed</td>
+        <td>2022-11-27 15:52:15</td>
+        <td>0:00:09.558903</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_pois_rel_pt_s4_osm_pp_place_of_worship</td>
+        <td>completed</td>
+        <td>2022-11-27 15:52:06</td>
+        <td>0:00:11.105302</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_cash_mkt_pt_s4_osm_pp_marketplace</td>
+        <td>completed</td>
+        <td>2022-11-27 15:51:55</td>
+        <td>0:00:09.820548</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_heal_hos_pt_s4_osm_pp_hospitals</td>
+        <td>completed</td>
+        <td>2022-11-27 15:51:46</td>
+        <td>0:00:10.378605</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_heal_hea_pt_s4_osm_pp_health_facilities</td>
+        <td>completed</td>
+        <td>2022-11-27 15:51:36</td>
+        <td>0:00:11.692326</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_cash_atm_pt_s4_osm_pp_atm</td>
+        <td>completed</td>
+        <td>2022-11-27 15:51:25</td>
+        <td>0:00:10.649669</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_cash_bnk_pt_s4_osm_pp_banks</td>
+        <td>completed</td>
+        <td>2022-11-27 15:51:15</td>
+        <td>0:00:10.167366</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_tran_por_pt_s4_osm_pp_port</td>
+        <td>completed</td>
+        <td>2022-11-27 15:51:05</td>
+        <td>0:00:10.397002</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_tran_fer_ln_s4_osm_pp_ferry_route</td>
+        <td>completed</td>
+        <td>2022-11-27 15:50:55</td>
+        <td>0:00:10.079246</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_tran_fte_pt_s4_osm_pp_ferry_terminal</td>
+        <td>completed</td>
+        <td>2022-11-27 15:50:45</td>
+        <td>0:00:09.480781</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_educ_uni_pt_s4_osm_pp_university</td>
+        <td>completed</td>
+        <td>2022-11-27 15:50:36</td>
+        <td>0:00:10.015043</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_educ_edu_pt_s4_osm_pp_school</td>
+        <td>completed</td>
+        <td>2022-11-27 15:50:26</td>
+        <td>0:00:11.038665</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_phys_dam_pt_s4_osm_pp_dam</td>
+        <td>completed</td>
+        <td>2022-11-27 15:50:14</td>
+        <td>0:00:09.896980</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_tran_rrd_ln_s4_osm_pp_subwaytram</td>
+        <td>completed</td>
+        <td>2022-11-27 15:50:05</td>
+        <td>0:00:09.492871</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_tran_rrd_ln_s4_osm_pp_railways</td>
+        <td>completed</td>
+        <td>2022-11-27 15:49:56</td>
+        <td>0:00:11.151159</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_tran_rds_ln_s4_osm_pp_roads</td>
+        <td>completed</td>
+        <td>2022-11-27 15:49:45</td>
+        <td>0:08:50.764615</td>
+      </tr>
+      <tr class="completed">
+        <td>tza_tran_rds_ln_s4_osm_pp_mainroads</td>
+        <td>completed</td>
+        <td>2022-11-27 15:40:54</td>
+        <td>0:00:33.898545</td>
+      </tr>
+</table>
+</body>
+</html>
