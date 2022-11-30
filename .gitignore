@@ -37,3 +37,5 @@ tools/update_ckan.bat
 tools/ckan_test.bat
 99_WebUI/status.dat
 99_WebUI/index.html
+99_WebUI/make_profile.db
+99_WebUI/status.dat.bak

@@ -10,14 +10,21 @@
     tr.started {
         background-color: yellow; 
     }
+    tr.failed {
+        background-color: red; 
+    }
 </style>
-</head>
+<script src="/sorttable.js" type="text/javascript"> </script></head>
 <body>
 <h1>Bluebell Pipeline Dashboard</h1>
 <table>
     <tr>
         <td><b>Pipeline Status</b></td>
         <td align="center"><b>Idle</b></td>
+    </tr>
+    <tr>
+        <td>Targets total</td>
+        <td align="center">204</b></td>
     </tr>
     <tr>
         <td>Targets in progress</td>
@@ -29,500 +36,1654 @@
     </tr>
     <tr>
         <td>Targets failed</td>
-        <td align="center">0</td>
+        <td align="center">1</td>
     </tr>
     <tr>
         <td>Oldest completed target</td>
-        <td align="center">2022-11-27 15:40:54</td>
+        <td align="center">2022-11-23 09:49:32</td>
     </tr>
 </table>
 <h3>Target statuses</h3>
-<table>
+<table class="sortable">
     <tr>
         <th>Target name</th>
+        <th>Last completed date</th>
         <th>Status</th>
         <th>Status date</th>
         <th>Duration</th>
+        <th>Log</th>
       </tr>
+      <tr class="failed">
+        <td>deploy/prod/population_api_tables</td>
+        <td>2022-11-24 00:54:26</td>
+        <td>failed</td>
+        <td>2022-11-29 15:18:38</td>
+        <td>1:01:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/prod/population_api_tables/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/s3/prod/population_api_tables_check_mdate</td>
+        <td>2022-11-29 15:18:38</td>
+        <td>completed</td>
+        <td>2022-11-29 15:18:38</td>
+        <td>0:00:06</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/s3/prod/population_api_tables_check_mdate/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/s3/prod/bivariate_tables_dump</td>
+        <td>2022-11-29 15:18:32</td>
+        <td>completed</td>
+        <td>2022-11-29 15:18:32</td>
+        <td>0:00:15</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/s3/prod/bivariate_tables_dump/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/bivariate_axis_correlation</td>
+        <td>2022-11-29 15:18:17</td>
+        <td>completed</td>
+        <td>2022-11-29 15:18:17</td>
+        <td>3:38:55</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/bivariate_axis_correlation/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/population/bivariate_tables_checks</td>
+        <td>2022-11-29 15:18:17</td>
+        <td>completed</td>
+        <td>2022-11-29 15:18:17</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/population/bivariate_tables_checks/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/population/bivariate_tables.sqld.gz</td>
+        <td>2022-11-29 15:18:17</td>
+        <td>completed</td>
+        <td>2022-11-29 15:18:17</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/population/bivariate_tables.sqld.gz/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/bivariate_axis</td>
+        <td>2022-11-29 11:39:22</td>
+        <td>completed</td>
+        <td>2022-11-29 11:39:22</td>
+        <td>4:03:22</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/bivariate_axis/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/s3/prod/stat_h3_dump</td>
+        <td>2022-11-29 08:01:49</td>
+        <td>completed</td>
+        <td>2022-11-29 08:01:49</td>
+        <td>0:10:57</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/s3/prod/stat_h3_dump/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/population/stat_h3.sqld.gz</td>
+        <td>2022-11-29 07:50:52</td>
+        <td>completed</td>
+        <td>2022-11-29 07:50:52</td>
+        <td>0:40:21</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/population/stat_h3.sqld.gz/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/stat_h3_quality</td>
+        <td>2022-11-29 07:36:00</td>
+        <td>completed</td>
+        <td>2022-11-29 07:36:00</td>
+        <td>0:07:53</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/stat_h3_quality/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/stat_h3_zeros_check</td>
+        <td>2022-11-29 07:28:07</td>
+        <td>completed</td>
+        <td>2022-11-29 07:28:07</td>
+        <td>0:17:36</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/stat_h3_zeros_check/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/prod/reports</td>
+        <td>2022-11-29 07:19:28</td>
+        <td>completed</td>
+        <td>2022-11-29 07:19:28</td>
+        <td>0:00:15</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/prod/reports/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/s3/prod/reports/reports.tar.gz</td>
+        <td>2022-11-29 07:19:13</td>
+        <td>completed</td>
+        <td>2022-11-29 07:19:13</td>
+        <td>0:00:16</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/s3/prod/reports/reports.tar.gz/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/s3/prod/reports/prod_reports_public</td>
+        <td>2022-11-29 07:19:12</td>
+        <td>completed</td>
+        <td>2022-11-29 07:19:12</td>
+        <td>0:00:15</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/s3/prod/reports/prod_reports_public/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_missing_roads</td>
+        <td>2022-11-29 07:18:57</td>
+        <td>completed</td>
+        <td>2022-11-29 07:18:57</td>
+        <td>0:08:26</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_missing_roads/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/reports/osm_missing_roads.csv</td>
+        <td>2022-11-29 07:18:57</td>
+        <td>completed</td>
+        <td>2022-11-29 07:18:57</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/reports/osm_missing_roads.csv/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_reports_list</td>
+        <td>2022-11-29 07:18:57</td>
+        <td>completed</td>
+        <td>2022-11-29 07:18:57</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_reports_list/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/geocint/reports/osm_missing_roads.csv</td>
+        <td>2022-11-29 07:18:57</td>
+        <td>completed</td>
+        <td>2022-11-29 07:18:57</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/geocint/reports/osm_missing_roads.csv/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/reports/osm_reports_list_prod.json</td>
+        <td>2022-11-29 07:18:57</td>
+        <td>completed</td>
+        <td>2022-11-29 07:18:57</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/reports/osm_reports_list_prod.json/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/geocint/reports/osm_reports_list_prod.json</td>
+        <td>2022-11-29 07:18:57</td>
+        <td>completed</td>
+        <td>2022-11-29 07:18:57</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/geocint/reports/osm_reports_list_prod.json/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/geocint/reports/prod/reports.tar.gz</td>
+        <td>2022-11-29 07:18:57</td>
+        <td>completed</td>
+        <td>2022-11-29 07:18:57</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/geocint/reports/prod/reports.tar.gz/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_unmapped_places_report</td>
+        <td>2022-11-29 07:14:41</td>
+        <td>completed</td>
+        <td>2022-11-29 07:14:41</td>
+        <td>0:04:10</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_unmapped_places_report/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/reports/osm_unmapped_places.csv</td>
+        <td>2022-11-29 07:14:41</td>
+        <td>completed</td>
+        <td>2022-11-29 07:14:41</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/reports/osm_unmapped_places.csv/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/geocint/reports/osm_unmapped_places.csv</td>
+        <td>2022-11-29 07:14:41</td>
+        <td>completed</td>
+        <td>2022-11-29 07:14:41</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/geocint/reports/osm_unmapped_places.csv/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/stat_h3</td>
+        <td>2022-11-29 07:10:31</td>
+        <td>completed</td>
+        <td>2022-11-29 07:10:31</td>
+        <td>1:53:45</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/stat_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/bivariate_unit</td>
+        <td>2022-11-29 07:10:31</td>
+        <td>completed</td>
+        <td>2022-11-29 07:10:31</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/bivariate_unit/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/bivariate_colors</td>
+        <td>2022-11-29 07:10:31</td>
+        <td>completed</td>
+        <td>2022-11-29 07:10:31</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/bivariate_colors/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/bivariate_unit_localization</td>
+        <td>2022-11-29 07:10:31</td>
+        <td>completed</td>
+        <td>2022-11-29 07:10:31</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/bivariate_unit_localization/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/bivariate_indicators</td>
+        <td>2022-11-29 07:10:31</td>
+        <td>completed</td>
+        <td>2022-11-29 07:10:31</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/bivariate_indicators/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/isodist_hospitals_h3</td>
+        <td>2022-11-29 05:16:46</td>
+        <td>completed</td>
+        <td>2022-11-29 05:16:46</td>
+        <td>1:19:20</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/isodist_hospitals_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/isodist_charging_stations_h3</td>
+        <td>2022-11-29 05:13:27</td>
+        <td>completed</td>
+        <td>2022-11-29 05:13:27</td>
+        <td>1:16:01</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/isodist_charging_stations_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/isodist_fire_stations_h3</td>
+        <td>2022-11-29 05:13:21</td>
+        <td>completed</td>
+        <td>2022-11-29 05:13:21</td>
+        <td>1:15:55</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/isodist_fire_stations_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/isodist_bomb_shelters_h3</td>
+        <td>2022-11-29 05:05:44</td>
+        <td>completed</td>
+        <td>2022-11-29 05:05:44</td>
+        <td>1:08:18</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/isodist_bomb_shelters_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/solar_farms_placement_suitability_synthetic_h3</td>
+        <td>2022-11-29 04:42:41</td>
+        <td>completed</td>
+        <td>2022-11-29 04:42:41</td>
+        <td>0:21:29</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/solar_farms_placement_suitability_synthetic_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/proximities_h3</td>
+        <td>2022-11-29 04:21:12</td>
+        <td>completed</td>
+        <td>2022-11-29 04:21:12</td>
+        <td>0:15:58</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/proximities_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/populated_areas_proximity_h3_r8</td>
+        <td>2022-11-29 04:05:14</td>
+        <td>completed</td>
+        <td>2022-11-29 04:05:14</td>
+        <td>0:52:04</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/populated_areas_proximity_h3_r8/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/update_isochrone_destinations_h3_r8</td>
+        <td>2022-11-29 03:57:26</td>
+        <td>completed</td>
+        <td>2022-11-29 03:57:26</td>
+        <td>1:18:12</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/update_isochrone_destinations_h3_r8/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/update_isochrone_destinations</td>
+        <td>2022-11-29 03:57:26</td>
+        <td>completed</td>
+        <td>2022-11-29 03:57:26</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/update_isochrone_destinations/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/total_road_length_h3</td>
+        <td>2022-11-29 03:14:18</td>
+        <td>completed</td>
+        <td>2022-11-29 03:14:18</td>
+        <td>0:23:29</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/total_road_length_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/populated_areas_proximity</td>
+        <td>2022-11-29 03:13:10</td>
+        <td>completed</td>
+        <td>2022-11-29 03:13:10</td>
+        <td>3:18:17</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/populated_areas_proximity/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_road_segments_h3</td>
+        <td>2022-11-29 02:50:49</td>
+        <td>completed</td>
+        <td>2022-11-29 02:50:49</td>
+        <td>0:11:35</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_road_segments_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_road_segments</td>
+        <td>2022-11-29 02:39:14</td>
+        <td>completed</td>
+        <td>2022-11-29 02:39:14</td>
+        <td>0:00:01</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_road_segments/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/function/calculate_isodist_h3</td>
+        <td>2022-11-29 02:39:14</td>
+        <td>completed</td>
+        <td>2022-11-29 02:39:14</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/function/calculate_isodist_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/index/osm_road_segments_new_seg_id_node_from_node_to_seg_geom_idx</td>
+        <td>2022-11-29 02:39:13</td>
+        <td>completed</td>
+        <td>2022-11-29 02:39:13</td>
+        <td>0:43:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/index/osm_road_segments_new_seg_id_node_from_node_to_seg_geom_idx/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/index/osm_road_segments_new_seg_geom_idx</td>
+        <td>2022-11-29 02:20:07</td>
+        <td>completed</td>
+        <td>2022-11-29 02:20:07</td>
+        <td>0:23:54</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/index/osm_road_segments_new_seg_geom_idx/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_road_segments_new</td>
+        <td>2022-11-29 01:56:13</td>
+        <td>completed</td>
+        <td>2022-11-29 01:56:13</td>
+        <td>7:53:13</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_road_segments_new/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/s3/osm_buildings_minsk</td>
+        <td>2022-11-29 00:42:23</td>
+        <td>completed</td>
+        <td>2022-11-29 00:42:23</td>
+        <td>0:00:02</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/s3/osm_buildings_minsk/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_buildings_minsk</td>
+        <td>2022-11-29 00:42:21</td>
+        <td>completed</td>
+        <td>2022-11-29 00:42:21</td>
+        <td>0:00:01</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_buildings_minsk/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/osm_buildings_minsk.geojson.gz</td>
+        <td>2022-11-29 00:42:21</td>
+        <td>completed</td>
+        <td>2022-11-29 00:42:21</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/osm_buildings_minsk.geojson.gz/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_buildings_use</td>
+        <td>2022-11-29 00:42:20</td>
+        <td>completed</td>
+        <td>2022-11-29 00:42:20</td>
+        <td>4:36:09</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_buildings_use/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/power_substations_proximity_h3_r8</td>
+        <td>2022-11-29 00:40:03</td>
+        <td>completed</td>
+        <td>2022-11-29 00:40:03</td>
+        <td>0:36:34</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/power_substations_proximity_h3_r8/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/s3/topology_boundaries</td>
+        <td>2022-11-29 00:19:08</td>
+        <td>completed</td>
+        <td>2022-11-29 00:19:08</td>
+        <td>0:00:33</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/s3/topology_boundaries/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/topology_boundaries.geojson.gz</td>
+        <td>2022-11-29 00:18:35</td>
+        <td>completed</td>
+        <td>2022-11-29 00:18:35</td>
+        <td>0:15:43</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/topology_boundaries.geojson.gz/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/power_substations_proximity</td>
+        <td>2022-11-29 00:03:29</td>
+        <td>completed</td>
+        <td>2022-11-29 00:03:29</td>
+        <td>3:33:35</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/power_substations_proximity/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/topology_boundaries</td>
+        <td>2022-11-29 00:02:52</td>
+        <td>completed</td>
+        <td>2022-11-29 00:02:52</td>
+        <td>0:53:49</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/topology_boundaries/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/mid/populated_areas/populated_areas_proximity.tif</td>
+        <td>2022-11-28 23:54:53</td>
+        <td>completed</td>
+        <td>2022-11-28 23:54:53</td>
+        <td>1:39:57</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/mid/populated_areas/populated_areas_proximity.tif/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/s3/kontur_boundaries</td>
+        <td>2022-11-28 23:41:32</td>
+        <td>completed</td>
+        <td>2022-11-28 23:41:32</td>
+        <td>0:01:52</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/s3/kontur_boundaries/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/kontur_boundaries.geojson.gz</td>
+        <td>2022-11-28 23:39:40</td>
+        <td>completed</td>
+        <td>2022-11-28 23:39:40</td>
+        <td>0:30:37</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/kontur_boundaries.geojson.gz/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/global_rva_h3</td>
+        <td>2022-11-28 23:31:25</td>
+        <td>completed</td>
+        <td>2022-11-28 23:31:25</td>
+        <td>0:22:22</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/global_rva_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/covid19_h3</td>
+        <td>2022-11-28 23:12:31</td>
+        <td>completed</td>
+        <td>2022-11-28 23:12:31</td>
+        <td>0:17:48</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/covid19_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/hexagons_for_regression</td>
+        <td>2022-11-28 23:12:21</td>
+        <td>completed</td>
+        <td>2022-11-28 23:12:21</td>
+        <td>0:03:18</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/hexagons_for_regression/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/reports/population_check_osm.csv</td>
+        <td>2022-11-28 23:10:07</td>
+        <td>completed</td>
+        <td>2022-11-28 23:10:07</td>
+        <td>0:00:01</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/reports/population_check_osm.csv/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/geocint/reports/population_check_osm.csv</td>
+        <td>2022-11-28 23:10:07</td>
+        <td>completed</td>
+        <td>2022-11-28 23:10:07</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/geocint/reports/population_check_osm.csv/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/reports/population_check</td>
+        <td>2022-11-28 23:10:07</td>
+        <td>completed</td>
+        <td>2022-11-28 23:10:07</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/reports/population_check/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/population_check_osm</td>
+        <td>2022-11-28 23:10:06</td>
+        <td>completed</td>
+        <td>2022-11-28 23:10:06</td>
+        <td>0:00:43</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/population_check_osm/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/hdx_boundaries</td>
+        <td>2022-11-28 23:09:23</td>
+        <td>completed</td>
+        <td>2022-11-28 23:09:23</td>
+        <td>0:00:20</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/hdx_boundaries/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_gadm_comparison</td>
+        <td>2022-11-28 23:09:10</td>
+        <td>completed</td>
+        <td>2022-11-28 23:09:10</td>
+        <td>0:00:07</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_gadm_comparison/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/reports/osm_gadm_comparison.csv</td>
+        <td>2022-11-28 23:09:10</td>
+        <td>completed</td>
+        <td>2022-11-28 23:09:10</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/reports/osm_gadm_comparison.csv/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/geocint/reports/osm_gadm_comparison.csv</td>
+        <td>2022-11-28 23:09:10</td>
+        <td>completed</td>
+        <td>2022-11-28 23:09:10</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/geocint/reports/osm_gadm_comparison.csv/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/reports/population_check_world</td>
+        <td>2022-11-28 23:09:05</td>
+        <td>completed</td>
+        <td>2022-11-28 23:09:05</td>
+        <td>0:00:02</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/reports/population_check_world/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/kontur_boundaries</td>
+        <td>2022-11-28 23:09:03</td>
+        <td>completed</td>
+        <td>2022-11-28 23:09:03</td>
+        <td>1:11:11</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/kontur_boundaries/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/covid19_population_h3_r8</td>
+        <td>2022-11-28 22:54:43</td>
+        <td>completed</td>
+        <td>2022-11-28 22:54:43</td>
+        <td>0:56:51</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/covid19_population_h3_r8/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/gdp_h3</td>
+        <td>2022-11-28 22:36:53</td>
+        <td>completed</td>
+        <td>2022-11-28 22:36:53</td>
+        <td>0:39:01</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/gdp_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/facebook_roads_h3</td>
+        <td>2022-11-28 22:15:12</td>
+        <td>completed</td>
+        <td>2022-11-28 22:15:12</td>
+        <td>3:58:16</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/facebook_roads_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/in/populated_areas.gpkg</td>
+        <td>2022-11-28 22:14:56</td>
+        <td>completed</td>
+        <td>2022-11-28 22:14:56</td>
+        <td>0:17:04</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/in/populated_areas.gpkg/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/residential_pop_h3</td>
+        <td>2022-11-28 22:05:27</td>
+        <td>completed</td>
+        <td>2022-11-28 22:05:27</td>
+        <td>0:07:35</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/residential_pop_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/pf_maxtemp_h3</td>
+        <td>2022-11-28 22:05:07</td>
+        <td>completed</td>
+        <td>2022-11-28 22:05:07</td>
+        <td>0:07:15</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/pf_maxtemp_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/us_census_tracts_stats_h3</td>
+        <td>2022-11-28 22:04:01</td>
+        <td>completed</td>
+        <td>2022-11-28 22:04:01</td>
+        <td>0:01:59</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/us_census_tracts_stats_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/us_census_tract_stats</td>
+        <td>2022-11-28 22:02:02</td>
+        <td>completed</td>
+        <td>2022-11-28 22:02:02</td>
+        <td>0:00:10</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/us_census_tract_stats/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/us_census_tracts_population_h3_r8</td>
+        <td>2022-11-28 22:01:52</td>
+        <td>completed</td>
+        <td>2022-11-28 22:01:52</td>
+        <td>0:04:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/us_census_tracts_population_h3_r8/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/kontur_population_h3</td>
+        <td>2022-11-28 21:57:52</td>
+        <td>completed</td>
+        <td>2022-11-28 21:57:52</td>
+        <td>1:28:21</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/kontur_population_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/prod/users_tiles</td>
+        <td>2022-11-28 21:44:02</td>
+        <td>completed</td>
+        <td>2022-11-28 21:44:02</td>
+        <td>0:03:07</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/prod/users_tiles/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/s3/prod/osm_users_hex_dump</td>
+        <td>2022-11-28 21:41:54</td>
+        <td>completed</td>
+        <td>2022-11-28 21:41:54</td>
+        <td>0:00:35</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/s3/prod/osm_users_hex_dump/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/s3/test/osm_users_hex_dump</td>
+        <td>2022-11-28 21:41:19</td>
+        <td>completed</td>
+        <td>2022-11-28 21:41:19</td>
+        <td>0:00:44</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/s3/test/osm_users_hex_dump/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/tiles/users_tiles.tar.bz2</td>
+        <td>2022-11-28 21:40:55</td>
+        <td>completed</td>
+        <td>2022-11-28 21:40:55</td>
+        <td>0:01:38</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/tiles/users_tiles.tar.bz2/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/osm_users_hex.sql.gz</td>
+        <td>2022-11-28 21:40:35</td>
+        <td>completed</td>
+        <td>2022-11-28 21:40:35</td>
+        <td>0:01:18</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/osm_users_hex.sql.gz/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/osm_users_hex_dump_min_file_size</td>
+        <td>2022-11-28 21:40:35</td>
+        <td>completed</td>
+        <td>2022-11-28 21:40:35</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/osm_users_hex_dump_min_file_size/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_users_hex</td>
+        <td>2022-11-28 21:39:17</td>
+        <td>completed</td>
+        <td>2022-11-28 21:39:17</td>
+        <td>2:49:12</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_users_hex/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/mid/power_substations/power_substations_proximity.tif</td>
+        <td>2022-11-28 20:29:54</td>
+        <td>completed</td>
+        <td>2022-11-28 20:29:54</td>
+        <td>1:16:53</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/mid/power_substations/power_substations_proximity.tif/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_water_polygons</td>
+        <td>2022-11-28 20:29:31</td>
+        <td>completed</td>
+        <td>2022-11-28 20:29:31</td>
+        <td>0:21:33</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_water_polygons/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_water_polygons_in_subdivided</td>
+        <td>2022-11-28 20:07:58</td>
+        <td>completed</td>
+        <td>2022-11-28 20:07:58</td>
+        <td>0:56:27</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_water_polygons_in_subdivided/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_unpopulated</td>
+        <td>2022-11-28 20:06:59</td>
+        <td>completed</td>
+        <td>2022-11-28 20:06:59</td>
+        <td>0:55:28</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_unpopulated/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_landuse</td>
+        <td>2022-11-28 20:06:11</td>
+        <td>completed</td>
+        <td>2022-11-28 20:06:11</td>
+        <td>0:54:40</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_landuse/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_water_lines_buffers_subdivided</td>
+        <td>2022-11-28 19:48:51</td>
+        <td>completed</td>
+        <td>2022-11-28 19:48:51</td>
+        <td>0:11:08</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_water_lines_buffers_subdivided/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/s3/osm_addresses_minsk</td>
+        <td>2022-11-28 19:43:53</td>
+        <td>completed</td>
+        <td>2022-11-28 19:43:53</td>
+        <td>0:00:03</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/s3/osm_addresses_minsk/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/osm_addresses_minsk.geojson.gz</td>
+        <td>2022-11-28 19:43:50</td>
+        <td>completed</td>
+        <td>2022-11-28 19:43:50</td>
+        <td>0:00:01</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/osm_addresses_minsk.geojson.gz/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_addresses_minsk</td>
+        <td>2022-11-28 19:43:49</td>
+        <td>completed</td>
+        <td>2022-11-28 19:43:49</td>
+        <td>0:00:09</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_addresses_minsk/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/index/osm_addresses_geom_idx</td>
+        <td>2022-11-28 19:43:40</td>
+        <td>completed</td>
+        <td>2022-11-28 19:43:40</td>
+        <td>0:02:08</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/index/osm_addresses_geom_idx/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_addresses</td>
+        <td>2022-11-28 19:41:32</td>
+        <td>completed</td>
+        <td>2022-11-28 19:41:32</td>
+        <td>0:30:01</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_addresses/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_water_lines</td>
+        <td>2022-11-28 19:37:43</td>
+        <td>completed</td>
+        <td>2022-11-28 19:37:43</td>
+        <td>0:26:12</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_water_lines/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/covid19_admin_boundaries</td>
+        <td>2022-11-28 19:34:56</td>
+        <td>completed</td>
+        <td>2022-11-28 19:34:56</td>
+        <td>0:23:25</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/covid19_admin_boundaries/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_population_inconsistencies</td>
+        <td>2022-11-28 19:30:23</td>
+        <td>completed</td>
+        <td>2022-11-28 19:30:23</td>
+        <td>0:01:40</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_population_inconsistencies/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/reports/osm_population_inconsistencies.csv</td>
+        <td>2022-11-28 19:30:23</td>
+        <td>completed</td>
+        <td>2022-11-28 19:30:23</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/reports/osm_population_inconsistencies.csv/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/geocint/reports/osm_population_inconsistencies.csv</td>
+        <td>2022-11-28 19:30:23</td>
+        <td>completed</td>
+        <td>2022-11-28 19:30:23</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/geocint/reports/osm_population_inconsistencies.csv/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_missing_boundaries_report</td>
+        <td>2022-11-28 19:29:34</td>
+        <td>completed</td>
+        <td>2022-11-28 19:29:34</td>
+        <td>0:00:51</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_missing_boundaries_report/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/out/reports/osm_missing_boundaries_report.csv</td>
+        <td>2022-11-28 19:29:34</td>
+        <td>completed</td>
+        <td>2022-11-28 19:29:34</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/out/reports/osm_missing_boundaries_report.csv/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/geocint/reports/osm_missing_boundaries_report.csv</td>
+        <td>2022-11-28 19:29:34</td>
+        <td>completed</td>
+        <td>2022-11-28 19:29:34</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/geocint/reports/osm_missing_boundaries_report.csv/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_admin_boundaries</td>
+        <td>2022-11-28 19:28:43</td>
+        <td>completed</td>
+        <td>2022-11-28 19:28:43</td>
+        <td>0:17:12</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_admin_boundaries/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/prod/osrm-backend-by-car</td>
+        <td>2022-11-28 19:26:03</td>
+        <td>completed</td>
+        <td>2022-11-28 19:26:03</td>
+        <td>0:00:03</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/prod/osrm-backend-by-car/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>deploy/geocint/belarus-latest.osm.pbf</td>
+        <td>2022-11-28 19:26:00</td>
+        <td>completed</td>
+        <td>2022-11-28 19:26:00</td>
+        <td>0:00:02</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/deploy/geocint/belarus-latest.osm.pbf/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/belarus-latest.osm.pbf</td>
+        <td>2022-11-28 19:25:57</td>
+        <td>completed</td>
+        <td>2022-11-28 19:25:57</td>
+        <td>0:14:07</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/belarus-latest.osm.pbf/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_landuse_industrial_h3</td>
+        <td>2022-11-28 19:20:20</td>
+        <td>completed</td>
+        <td>2022-11-28 19:20:20</td>
+        <td>0:07:13</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_landuse_industrial_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_residential_landuse</td>
+        <td>2022-11-28 19:18:30</td>
+        <td>completed</td>
+        <td>2022-11-28 19:18:30</td>
+        <td>0:06:59</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_residential_landuse/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_places_eatery_h3</td>
+        <td>2022-11-28 19:16:28</td>
+        <td>completed</td>
+        <td>2022-11-28 19:16:28</td>
+        <td>0:04:57</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_places_eatery_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_places_food_shops_h3</td>
+        <td>2022-11-28 19:14:28</td>
+        <td>completed</td>
+        <td>2022-11-28 19:14:28</td>
+        <td>0:02:57</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_places_food_shops_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_landuse_industrial</td>
+        <td>2022-11-28 19:13:07</td>
+        <td>completed</td>
+        <td>2022-11-28 19:13:07</td>
+        <td>0:01:36</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_landuse_industrial/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/in/power_substations.gpkg</td>
+        <td>2022-11-28 19:13:01</td>
+        <td>completed</td>
+        <td>2022-11-28 19:13:01</td>
+        <td>0:01:30</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/in/power_substations.gpkg/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/isochrone_destinations_new</td>
+        <td>2022-11-28 19:12:42</td>
+        <td>completed</td>
+        <td>2022-11-28 19:12:42</td>
+        <td>0:01:11</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/isochrone_destinations_new/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/waste_containers_h3</td>
+        <td>2022-11-28 19:12:21</td>
+        <td>completed</td>
+        <td>2022-11-28 19:12:21</td>
+        <td>0:00:50</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/waste_containers_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>data/belarus_boundary.geojson</td>
+        <td>2022-11-28 19:11:50</td>
+        <td>completed</td>
+        <td>2022-11-28 19:11:50</td>
+        <td>0:00:19</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/belarus_boundary.geojson/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/index/osm_tags_idx</td>
+        <td>2022-11-28 19:11:31</td>
+        <td>completed</td>
+        <td>2022-11-28 19:11:31</td>
+        <td>2:18:29</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/index/osm_tags_idx/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_volcanos_h3</td>
+        <td>2022-11-28 19:11:31</td>
+        <td>completed</td>
+        <td>2022-11-28 19:11:31</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_volcanos_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/user_hours_h3</td>
+        <td>2022-11-28 19:00:37</td>
+        <td>completed</td>
+        <td>2022-11-28 19:00:37</td>
+        <td>0:10:32</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/user_hours_h3/log.txt">...</a></td>
+      </tr>
+      <tr class="completed">
+        <td>db/table/osm_local_active_users</td>
+        <td>2022-11-28 18:50:05</td>
+        <td>completed</td>
+        <td>2022-11-28 18:50:05</td>
+        <td>0:00:32</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_local_active_users/log.txt">...</a></td>
+      </tr>
       <tr class="completed">
-        <td>blr_cmf</td>
+        <td>db/table/osm_user_count_grid_h3</td>
+        <td>2022-11-28 18:49:33</td>
         <td>completed</td>
-        <td>2022-11-28 17:31:07</td>
-        <td>0:01:34.366987</td>
+        <td>2022-11-28 18:49:33</td>
+        <td>1:17:29</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_user_count_grid_h3/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_admn_ad3_py_s4_osm_pp_adminboundary3</td>
+        <td>db/table/building_count_grid_h3</td>
+        <td>2022-11-28 18:39:47</td>
         <td>completed</td>
-        <td>2022-11-28 17:29:33</td>
-        <td>0:00:40.321074</td>
+        <td>2022-11-28 18:39:47</td>
+        <td>0:01:54</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/building_count_grid_h3/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_admn_ad2_py_s4_osm_pp_adminboundary2</td>
+        <td>db/table/osm_building_count_grid_h3_r8</td>
+        <td>2022-11-28 18:37:53</td>
         <td>completed</td>
-        <td>2022-11-28 17:28:53</td>
-        <td>0:00:13.567741</td>
+        <td>2022-11-28 18:37:53</td>
+        <td>0:31:32</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_building_count_grid_h3_r8/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_admn_ad1_py_s4_osm_pp_adminboundary1</td>
+        <td>db/table/osm_road_segments_6_months_h3</td>
+        <td>2022-11-28 18:35:13</td>
         <td>completed</td>
-        <td>2022-11-28 17:28:40</td>
-        <td>0:00:11.331818</td>
+        <td>2022-11-28 18:35:13</td>
+        <td>0:02:47</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_road_segments_6_months_h3/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_admn_ad0_py_s4_osm_pp_adminboundary0</td>
+        <td>db/table/osm_object_count_grid_h3</td>
+        <td>2022-11-28 18:32:58</td>
         <td>completed</td>
-        <td>2022-11-28 17:28:28</td>
-        <td>0:00:11.998736</td>
+        <td>2022-11-28 18:32:58</td>
+        <td>1:00:54</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_object_count_grid_h3/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_tran_air_pt_s4_osm_pp_airports</td>
+        <td>db/table/osm_road_segments_6_months</td>
+        <td>2022-11-28 18:32:26</td>
         <td>completed</td>
-        <td>2022-11-28 17:28:16</td>
-        <td>0:00:06.880086</td>
+        <td>2022-11-28 18:32:26</td>
+        <td>0:29:26</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_road_segments_6_months/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_elev_cst_ln_s4_osm_pp_coastline</td>
+        <td>db/table/facebook_roads</td>
+        <td>2022-11-28 18:16:56</td>
         <td>completed</td>
-        <td>2022-11-28 17:28:10</td>
-        <td>0:00:06.727660</td>
+        <td>2022-11-28 18:16:56</td>
+        <td>0:13:56</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/facebook_roads/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_wash_toi_pt_s4_osm_pp_toilets</td>
+        <td>db/table/osm_buildings</td>
+        <td>2022-11-28 18:06:21</td>
         <td>completed</td>
-        <td>2022-11-28 17:28:04</td>
-        <td>0:00:06.659912</td>
+        <td>2022-11-28 18:06:21</td>
+        <td>1:13:19</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_buildings/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_wash_wts_pt_s4_osm_pp_water_source</td>
+        <td>db/table/osm_roads</td>
+        <td>2022-11-28 18:03:00</td>
         <td>completed</td>
-        <td>2022-11-28 17:27:58</td>
-        <td>0:00:07.354697</td>
+        <td>2022-11-28 18:03:00</td>
+        <td>1:09:58</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_roads/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_shel_eaa_pt_s4_osm_pp_emergency</td>
+        <td>db/table/bivariate_overlays</td>
+        <td>2022-11-28 17:38:31</td>
         <td>completed</td>
-        <td>2022-11-28 17:27:51</td>
-        <td>0:00:06.778493</td>
+        <td>2022-11-28 17:38:31</td>
+        <td>0:06:27</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/bivariate_overlays/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_tran_rst_pt_s4_osm_pp_railway_station</td>
+        <td>db/table/prescale_to_osm_coefficient_table</td>
+        <td>2022-11-28 17:37:25</td>
         <td>completed</td>
-        <td>2022-11-28 17:27:45</td>
-        <td>0:00:06.656897</td>
+        <td>2022-11-28 17:37:25</td>
+        <td>0:21:43</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/prescale_to_osm_coefficient_table/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_tran_can_ln_s4_osm_pp_canals</td>
+        <td>db/table/osm_meta</td>
+        <td>2022-11-28 17:32:04</td>
         <td>completed</td>
-        <td>2022-11-28 17:27:39</td>
-        <td>0:00:08.342842</td>
+        <td>2022-11-28 17:32:04</td>
+        <td>0:39:02</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/osm_meta/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_phys_riv_ln_s4_osm_pp_rivers</td>
+        <td>db/procedure/decimate_admin_level_in_prescale_to_osm_boundaries</td>
+        <td>2022-11-28 17:15:42</td>
         <td>completed</td>
-        <td>2022-11-28 17:27:31</td>
-        <td>0:00:34.081452</td>
+        <td>2022-11-28 17:15:42</td>
+        <td>0:08:14</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/procedure/decimate_admin_level_in_prescale_to_osm_boundaries/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_phys_lak_py_s4_osm_pp_natural_water</td>
+        <td>db/table/prescale_to_osm_boundaries</td>
+        <td>2022-11-28 17:07:28</td>
         <td>completed</td>
-        <td>2022-11-28 17:26:56</td>
-        <td>0:00:57.920499</td>
+        <td>2022-11-28 17:07:28</td>
+        <td>0:14:26</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/db/table/prescale_to_osm_boundaries/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_util_mil_py_s4_osm_pp_militaryinstallation</td>
+        <td>data/planet-check-refs</td>
+        <td>2022-11-28 17:00:53</td>
         <td>completed</td>
-        <td>2022-11-28 17:25:59</td>
-        <td>0:00:07.284686</td>
+        <td>2022-11-28 17:00:53</td>
+        <td>0:07:51</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/dab03c73085d73c9ccac/data/planet-check-refs/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_util_pst_pt_s4_osm_pp_substation</td>
+        <td>db/table/osm</td>
+        <td>2022-11-28 16:43:21</td>
         <td>completed</td>
-        <td>2022-11-28 17:25:52</td>
-        <td>0:00:08.261178</td>
+        <td>2022-11-28 16:43:21</td>
+        <td>4:58:59</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/5e71f0a895f163d46cc4/db/table/osm/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_util_pst_pt_s4_osm_pp_powerstation</td>
+        <td>data/planet-latest-updated.osm.pbf</td>
+        <td>2022-11-28 11:44:22</td>
         <td>completed</td>
-        <td>2022-11-28 17:25:44</td>
-        <td>0:00:06.449556</td>
+        <td>2022-11-28 11:44:22</td>
+        <td>0:49:03</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/5e71f0a895f163d46cc4/data/planet-latest-updated.osm.pbf/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_util_pwl_ln_s4_osm_pp_powerline</td>
+        <td>data/planet-latest.osm.pbf</td>
+        <td>2022-11-28 10:55:19</td>
         <td>completed</td>
-        <td>2022-11-28 17:25:38</td>
-        <td>0:00:12.280237</td>
+        <td>2022-11-28 10:55:19</td>
+        <td>0:10:51</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/5e71f0a895f163d46cc4/data/planet-latest.osm.pbf/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_util_ppl_ln_s4_osm_pp_pipeline</td>
+        <td>db/table/disaster_event_episodes_h3</td>
+        <td>2022-11-27 20:37:37</td>
         <td>completed</td>
-        <td>2022-11-28 17:25:26</td>
-        <td>0:00:07.519643</td>
+        <td>2022-11-27 20:37:37</td>
+        <td>4:00:30</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/disaster_event_episodes_h3/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_tran_brg_pt_s4_osm_pp_bridges</td>
+        <td>db/table/wikidata_population</td>
+        <td>2022-11-27 17:16:57</td>
         <td>completed</td>
-        <td>2022-11-28 17:25:19</td>
-        <td>0:00:06.521266</td>
+        <td>2022-11-27 17:16:57</td>
+        <td>0:00:27</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/wikidata_population/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_stle_stl_pt_s4_osm_pp_townscities</td>
+        <td>data/in/wikidata_population_csv/download</td>
+        <td>2022-11-27 17:16:30</td>
         <td>completed</td>
-        <td>2022-11-28 17:25:13</td>
-        <td>0:00:07.251636</td>
+        <td>2022-11-27 17:16:30</td>
+        <td>0:58:17</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/in/wikidata_population_csv/download/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_stle_stl_pt_s4_osm_pp_settlements</td>
+        <td>db/table/tile_logs</td>
+        <td>2022-11-27 17:01:39</td>
         <td>completed</td>
-        <td>2022-11-28 17:25:06</td>
-        <td>0:00:24.424952</td>
+        <td>2022-11-27 17:01:39</td>
+        <td>0:43:16</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/tile_logs/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_pois_bor_pt_s4_osm_pp_border_control</td>
+        <td>db/table/mapswipe_hot_tasking_data_h3</td>
+        <td>2022-11-27 16:42:00</td>
         <td>completed</td>
-        <td>2022-11-28 17:24:42</td>
-        <td>0:00:07.031587</td>
+        <td>2022-11-27 16:42:00</td>
+        <td>0:22:34</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/mapswipe_hot_tasking_data_h3/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_cccm_ref_pt_s4_osm_pp_refugee_site</td>
+        <td>db/table/global_fires_stat_h3</td>
+        <td>2022-11-27 16:40:18</td>
         <td>completed</td>
-        <td>2022-11-28 17:24:35</td>
-        <td>0:00:06.474527</td>
+        <td>2022-11-27 16:40:18</td>
+        <td>0:05:03</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/global_fires_stat_h3/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_pois_rel_pt_s4_osm_pp_place_of_worship</td>
+        <td>db/table/disaster_event_episodes</td>
+        <td>2022-11-27 16:37:07</td>
         <td>completed</td>
-        <td>2022-11-28 17:24:29</td>
-        <td>0:00:07.263171</td>
+        <td>2022-11-27 16:37:07</td>
+        <td>0:18:58</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/disaster_event_episodes/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_cash_mkt_pt_s4_osm_pp_marketplace</td>
+        <td>deploy/s3/global_fires</td>
+        <td>2022-11-27 16:35:15</td>
         <td>completed</td>
-        <td>2022-11-28 17:24:22</td>
-        <td>0:00:06.182281</td>
+        <td>2022-11-27 16:35:15</td>
+        <td>0:00:28</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/deploy/s3/global_fires/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_heal_hos_pt_s4_osm_pp_hospitals</td>
+        <td>data/out/global_fires/update</td>
+        <td>2022-11-27 16:34:47</td>
         <td>completed</td>
-        <td>2022-11-28 17:24:15</td>
-        <td>0:00:06.949370</td>
+        <td>2022-11-27 16:34:47</td>
+        <td>0:06:44</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/out/global_fires/update/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_heal_hea_pt_s4_osm_pp_health_facilities</td>
+        <td>deploy/geocint/global_fires_h3_r8_13months.csv.gz</td>
+        <td>2022-11-27 16:30:43</td>
         <td>completed</td>
-        <td>2022-11-28 17:24:09</td>
-        <td>0:00:08.544190</td>
+        <td>2022-11-27 16:30:43</td>
+        <td>0:00:03</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/deploy/geocint/global_fires_h3_r8_13months.csv.gz/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_cash_atm_pt_s4_osm_pp_atm</td>
+        <td>data/out/global_fires/global_fires_h3_r8_13months.csv.gz</td>
+        <td>2022-11-27 16:30:40</td>
         <td>completed</td>
-        <td>2022-11-28 17:24:01</td>
-        <td>0:00:07.504672</td>
+        <td>2022-11-27 16:30:40</td>
+        <td>0:02:37</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/out/global_fires/global_fires_h3_r8_13months.csv.gz/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_cash_bnk_pt_s4_osm_pp_banks</td>
+        <td>db/table/global_fires</td>
+        <td>2022-11-27 16:28:03</td>
         <td>completed</td>
-        <td>2022-11-28 17:23:54</td>
-        <td>0:00:07.086020</td>
+        <td>2022-11-27 16:28:03</td>
+        <td>0:08:48</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/global_fires/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_tran_por_pt_s4_osm_pp_port</td>
+        <td>db/table/covid19_us_counties</td>
+        <td>2022-11-27 16:21:02</td>
         <td>completed</td>
-        <td>2022-11-28 17:23:47</td>
-        <td>0:00:06.374929</td>
+        <td>2022-11-27 16:21:02</td>
+        <td>0:00:12</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/covid19_us_counties/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_tran_fer_ln_s4_osm_pp_ferry_route</td>
+        <td>db/table/covid19_us_deaths_in</td>
+        <td>2022-11-27 16:20:50</td>
         <td>completed</td>
-        <td>2022-11-28 17:23:41</td>
-        <td>0:00:07.032176</td>
+        <td>2022-11-27 16:20:50</td>
+        <td>0:00:35</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/covid19_us_deaths_in/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_tran_fte_pt_s4_osm_pp_ferry_terminal</td>
+        <td>db/table/covid19_us_confirmed_in</td>
+        <td>2022-11-27 16:20:45</td>
         <td>completed</td>
-        <td>2022-11-28 17:23:34</td>
-        <td>0:00:06.840127</td>
+        <td>2022-11-27 16:20:45</td>
+        <td>0:00:35</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/covid19_us_confirmed_in/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_educ_uni_pt_s4_osm_pp_university</td>
+        <td>data/mid/covid19/normalized_us_deaths_csv</td>
+        <td>2022-11-27 16:20:15</td>
         <td>completed</td>
-        <td>2022-11-28 17:23:28</td>
-        <td>0:00:06.559572</td>
+        <td>2022-11-27 16:20:15</td>
+        <td>0:02:05</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/mid/covid19/normalized_us_deaths_csv/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_educ_edu_pt_s4_osm_pp_school</td>
+        <td>data/mid/covid19/normalized_us_confirmed_csv</td>
+        <td>2022-11-27 16:20:10</td>
         <td>completed</td>
-        <td>2022-11-28 17:23:22</td>
-        <td>0:00:08.058952</td>
+        <td>2022-11-27 16:20:10</td>
+        <td>0:02:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/mid/covid19/normalized_us_confirmed_csv/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_phys_dam_pt_s4_osm_pp_dam</td>
+        <td>data/mid/mapswipe/mapswipe_s3_data_update</td>
+        <td>2022-11-27 16:19:58</td>
         <td>completed</td>
-        <td>2022-11-28 17:23:14</td>
-        <td>0:00:06.791040</td>
+        <td>2022-11-27 16:19:58</td>
+        <td>0:01:23</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/mid/mapswipe/mapswipe_s3_data_update/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_tran_rrd_ln_s4_osm_pp_subwaytram</td>
+        <td>db/table/mapswipe_hot_tasking_data</td>
+        <td>2022-11-27 16:19:26</td>
         <td>completed</td>
-        <td>2022-11-28 17:23:08</td>
-        <td>0:00:06.800383</td>
+        <td>2022-11-27 16:19:26</td>
+        <td>0:00:51</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/mapswipe_hot_tasking_data/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_tran_rrd_ln_s4_osm_pp_railways</td>
+        <td>deploy/s3/prod/kontur_events_updated</td>
+        <td>2022-11-27 16:19:22</td>
         <td>completed</td>
-        <td>2022-11-28 17:23:02</td>
-        <td>0:00:11.477367</td>
+        <td>2022-11-27 16:19:22</td>
+        <td>0:00:29</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/deploy/s3/prod/kontur_events_updated/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_tran_rds_ln_s4_osm_pp_roads</td>
+        <td>db/table/global_fires_in</td>
+        <td>2022-11-27 16:19:15</td>
         <td>completed</td>
-        <td>2022-11-28 17:22:51</td>
-        <td>0:02:58.352097</td>
+        <td>2022-11-27 16:19:15</td>
+        <td>0:00:14</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/global_fires_in/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>blr_tran_rds_ln_s4_osm_pp_mainroads</td>
+        <td>data/in/global_fires/new_updates/download_new_updates</td>
+        <td>2022-11-27 16:19:01</td>
         <td>completed</td>
-        <td>2022-11-28 17:19:53</td>
-        <td>0:00:43.544794</td>
+        <td>2022-11-27 16:19:01</td>
+        <td>0:00:55</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/in/global_fires/new_updates/download_new_updates/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_wash_toi_pt_s4_osm_pp_toilets</td>
+        <td>data/out/kontur_events/updated</td>
+        <td>2022-11-27 16:18:53</td>
         <td>completed</td>
-        <td>2022-11-27 16:18:19</td>
-        <td>0:00:10.468237</td>
+        <td>2022-11-27 16:18:53</td>
+        <td>0:00:10</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/out/kontur_events/updated/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_cmf</td>
+        <td>data/in/kontur_events/download</td>
+        <td>2022-11-27 16:18:43</td>
         <td>completed</td>
-        <td>2022-11-27 15:59:32</td>
-        <td>0:02:30.025125</td>
+        <td>2022-11-27 16:18:43</td>
+        <td>0:00:37</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/in/kontur_events/download/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_admn_ad3_py_s4_osm_pp_adminboundary3</td>
+        <td>data/mid/mapswipe/ym_files/update</td>
+        <td>2022-11-27 16:18:35</td>
         <td>completed</td>
-        <td>2022-11-27 15:57:02</td>
-        <td>0:00:14.519955</td>
+        <td>2022-11-27 16:18:35</td>
+        <td>0:00:12</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/mid/mapswipe/ym_files/update/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_admn_ad2_py_s4_osm_pp_adminboundary2</td>
+        <td>db/table/users_deleted</td>
+        <td>2022-11-27 16:18:32</td>
         <td>completed</td>
-        <td>2022-11-27 15:56:48</td>
-        <td>0:00:10.357906</td>
+        <td>2022-11-27 16:18:32</td>
+        <td>0:00:08</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/users_deleted/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_admn_ad1_py_s4_osm_pp_adminboundary1</td>
+        <td>data/in/mapswipe/projects_old_update</td>
+        <td>2022-11-27 16:18:25</td>
         <td>completed</td>
-        <td>2022-11-27 15:56:38</td>
-        <td>0:00:20.369879</td>
+        <td>2022-11-27 16:18:25</td>
+        <td>0:00:09</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/in/mapswipe/projects_old_update/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_admn_ad0_py_s4_osm_pp_adminboundary0</td>
+        <td>data/in/users_deleted.txt</td>
+        <td>2022-11-27 16:18:24</td>
         <td>completed</td>
-        <td>2022-11-27 15:56:18</td>
-        <td>0:00:15.491508</td>
+        <td>2022-11-27 16:18:24</td>
+        <td>0:00:18</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/in/users_deleted.txt/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_tran_air_pt_s4_osm_pp_airports</td>
+        <td>data/tile_logs/_download</td>
+        <td>2022-11-27 16:18:23</td>
         <td>completed</td>
-        <td>2022-11-27 15:56:03</td>
-        <td>0:00:09.797730</td>
+        <td>2022-11-27 16:18:23</td>
+        <td>0:00:17</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/tile_logs/_download/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_elev_cst_ln_s4_osm_pp_coastline</td>
+        <td>data/mid/mapswipe/ym_files/unzip</td>
+        <td>2022-11-27 16:18:23</td>
         <td>completed</td>
-        <td>2022-11-27 15:55:54</td>
-        <td>0:00:16.075486</td>
+        <td>2022-11-27 16:18:23</td>
+        <td>0:00:06</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/mid/mapswipe/ym_files/unzip/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_wash_wts_pt_s4_osm_pp_water_source</td>
+        <td>db/table/covid19_in</td>
+        <td>2022-11-27 16:18:20</td>
         <td>completed</td>
-        <td>2022-11-27 15:55:28</td>
-        <td>0:00:10.637803</td>
+        <td>2022-11-27 16:18:20</td>
+        <td>0:00:08</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/covid19_in/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_shel_eaa_pt_s4_osm_pp_emergency</td>
+        <td>db/table/mapswipe_projects_old</td>
+        <td>2022-11-27 16:18:20</td>
         <td>completed</td>
-        <td>2022-11-27 15:55:18</td>
-        <td>0:00:09.494282</td>
+        <td>2022-11-27 16:18:20</td>
+        <td>0:00:04</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/mapswipe_projects_old/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_tran_rst_pt_s4_osm_pp_railway_station</td>
+        <td>data/mid/mapswipe/mapswipe_delta.csv</td>
+        <td>2022-11-27 16:18:20</td>
         <td>completed</td>
-        <td>2022-11-27 15:55:08</td>
-        <td>0:00:09.949346</td>
+        <td>2022-11-27 16:18:20</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/mid/mapswipe/mapswipe_delta.csv/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_tran_can_ln_s4_osm_pp_canals</td>
+        <td>data/in/mapswipe/mapswipe.zip</td>
+        <td>2022-11-27 16:18:17</td>
         <td>completed</td>
-        <td>2022-11-27 15:54:58</td>
-        <td>0:00:09.990712</td>
+        <td>2022-11-27 16:18:17</td>
+        <td>0:00:11</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/in/mapswipe/mapswipe.zip/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_phys_riv_ln_s4_osm_pp_rivers</td>
+        <td>data/in/mapswipe/projects_old.csv</td>
+        <td>2022-11-27 16:18:16</td>
         <td>completed</td>
-        <td>2022-11-27 15:54:49</td>
-        <td>0:00:25.132568</td>
+        <td>2022-11-27 16:18:16</td>
+        <td>0:00:10</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/in/mapswipe/projects_old.csv/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_phys_lak_py_s4_osm_pp_natural_water</td>
+        <td>db/table/hdx_locations_with_wikicodes</td>
+        <td>2022-11-27 16:18:15</td>
         <td>completed</td>
-        <td>2022-11-27 15:54:24</td>
-        <td>0:00:38.454436</td>
+        <td>2022-11-27 16:18:15</td>
+        <td>0:00:01</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/hdx_locations_with_wikicodes/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_util_mil_py_s4_osm_pp_militaryinstallation</td>
+        <td>db/table/wikidata_hasc_codes</td>
+        <td>2022-11-27 16:18:14</td>
         <td>completed</td>
-        <td>2022-11-27 15:53:46</td>
-        <td>0:00:10.564269</td>
+        <td>2022-11-27 16:18:14</td>
+        <td>0:00:01</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/wikidata_hasc_codes/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_util_pst_pt_s4_osm_pp_substation</td>
+        <td>data/in/wikidata_hasc_codes.csv</td>
+        <td>2022-11-27 16:18:13</td>
         <td>completed</td>
-        <td>2022-11-27 15:53:36</td>
-        <td>0:00:09.492055</td>
+        <td>2022-11-27 16:18:13</td>
+        <td>0:00:07</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/in/wikidata_hasc_codes.csv/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_util_pst_pt_s4_osm_pp_powerstation</td>
+        <td>data/mid/covid19/normalized_csv</td>
+        <td>2022-11-27 16:18:12</td>
         <td>completed</td>
-        <td>2022-11-27 15:53:26</td>
-        <td>0:00:10.887739</td>
+        <td>2022-11-27 16:18:12</td>
+        <td>0:00:04</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/mid/covid19/normalized_csv/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_util_pwl_ln_s4_osm_pp_powerline</td>
+        <td>data/in/covid19/_us_csv</td>
+        <td>2022-11-27 16:18:10</td>
         <td>completed</td>
-        <td>2022-11-27 15:53:16</td>
-        <td>0:00:10.548337</td>
+        <td>2022-11-27 16:18:10</td>
+        <td>0:00:04</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/in/covid19/_us_csv/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_util_ppl_ln_s4_osm_pp_pipeline</td>
+        <td>data/mid/covid19/covid19_utah.csv</td>
+        <td>2022-11-27 16:18:10</td>
         <td>completed</td>
-        <td>2022-11-27 15:53:06</td>
-        <td>0:00:09.447648</td>
+        <td>2022-11-27 16:18:10</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/mid/covid19/covid19_utah.csv/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_tran_brg_pt_s4_osm_pp_bridges</td>
+        <td>data/in/event_api_data/kontur_public_feed</td>
+        <td>2022-11-27 16:18:09</td>
         <td>completed</td>
-        <td>2022-11-27 15:52:56</td>
-        <td>0:00:10.899576</td>
+        <td>2022-11-27 16:18:09</td>
+        <td>0:00:03</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/in/event_api_data/kontur_public_feed/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_stle_stl_pt_s4_osm_pp_townscities</td>
+        <td>db/table/mapswipe_projects_new</td>
+        <td>2022-11-27 16:18:09</td>
         <td>completed</td>
-        <td>2022-11-27 15:52:46</td>
-        <td>0:00:10.676794</td>
+        <td>2022-11-27 16:18:09</td>
+        <td>0:00:02</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/mapswipe_projects_new/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_stle_stl_pt_s4_osm_pp_settlements</td>
+        <td>data/in/prescale_to_osm.csv</td>
+        <td>2022-11-27 16:18:08</td>
         <td>completed</td>
-        <td>2022-11-27 15:52:36</td>
-        <td>0:00:11.611628</td>
+        <td>2022-11-27 16:18:08</td>
+        <td>0:00:02</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/in/prescale_to_osm.csv/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_pois_bor_pt_s4_osm_pp_border_control</td>
+        <td>data/in/covid19/_global_csv</td>
+        <td>2022-11-27 16:18:08</td>
         <td>completed</td>
-        <td>2022-11-27 15:52:25</td>
-        <td>0:00:10.090482</td>
+        <td>2022-11-27 16:18:08</td>
+        <td>0:00:02</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/in/covid19/_global_csv/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_cccm_ref_pt_s4_osm_pp_refugee_site</td>
+        <td>db/table/prescale_to_osm</td>
+        <td>2022-11-27 16:18:08</td>
         <td>completed</td>
-        <td>2022-11-27 15:52:15</td>
-        <td>0:00:09.558903</td>
+        <td>2022-11-27 16:18:08</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/db/table/prescale_to_osm/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_pois_rel_pt_s4_osm_pp_place_of_worship</td>
+        <td>data/in/mapswipe/projects_new.csv</td>
+        <td>2022-11-27 16:18:07</td>
         <td>completed</td>
-        <td>2022-11-27 15:52:06</td>
-        <td>0:00:11.105302</td>
+        <td>2022-11-27 16:18:07</td>
+        <td>0:00:01</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/data/in/mapswipe/projects_new.csv/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_cash_mkt_pt_s4_osm_pp_marketplace</td>
+        <td>deploy</td>
+        <td>2022-11-27 16:18:06</td>
         <td>completed</td>
-        <td>2022-11-27 15:51:55</td>
-        <td>0:00:09.820548</td>
+        <td>2022-11-27 16:18:06</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/deploy/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_heal_hos_pt_s4_osm_pp_hospitals</td>
+        <td>deploy/geocint</td>
+        <td>2022-11-27 16:18:06</td>
         <td>completed</td>
-        <td>2022-11-27 15:51:46</td>
-        <td>0:00:10.378605</td>
+        <td>2022-11-27 16:18:06</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/deploy/geocint/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_heal_hea_pt_s4_osm_pp_health_facilities</td>
+        <td>deploy/s3</td>
+        <td>2022-11-27 16:18:06</td>
         <td>completed</td>
-        <td>2022-11-27 15:51:36</td>
-        <td>0:00:11.692326</td>
+        <td>2022-11-27 16:18:06</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/deploy/s3/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_cash_atm_pt_s4_osm_pp_atm</td>
+        <td>deploy/prod</td>
+        <td>2022-11-27 16:18:06</td>
         <td>completed</td>
-        <td>2022-11-27 15:51:25</td>
-        <td>0:00:10.649669</td>
+        <td>2022-11-27 16:18:06</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/deploy/prod/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_cash_bnk_pt_s4_osm_pp_banks</td>
+        <td>deploy/geocint/reports</td>
+        <td>2022-11-27 16:18:06</td>
         <td>completed</td>
-        <td>2022-11-27 15:51:15</td>
-        <td>0:00:10.167366</td>
+        <td>2022-11-27 16:18:06</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/deploy/geocint/reports/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_tran_por_pt_s4_osm_pp_port</td>
+        <td>deploy/geocint/reports/prod</td>
+        <td>2022-11-27 16:18:06</td>
         <td>completed</td>
-        <td>2022-11-27 15:51:05</td>
-        <td>0:00:10.397002</td>
+        <td>2022-11-27 16:18:06</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/deploy/geocint/reports/prod/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_tran_fer_ln_s4_osm_pp_ferry_route</td>
+        <td>deploy/s3/prod</td>
+        <td>2022-11-27 16:18:06</td>
         <td>completed</td>
-        <td>2022-11-27 15:50:55</td>
-        <td>0:00:10.079246</td>
+        <td>2022-11-27 16:18:06</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/deploy/s3/prod/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_tran_fte_pt_s4_osm_pp_ferry_terminal</td>
+        <td>deploy/s3/test</td>
+        <td>2022-11-27 16:18:06</td>
         <td>completed</td>
-        <td>2022-11-27 15:50:45</td>
-        <td>0:00:09.480781</td>
+        <td>2022-11-27 16:18:06</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/deploy/s3/test/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_educ_uni_pt_s4_osm_pp_university</td>
+        <td>deploy/s3/prod/reports</td>
+        <td>2022-11-27 16:18:06</td>
         <td>completed</td>
-        <td>2022-11-27 15:50:36</td>
-        <td>0:00:10.015043</td>
+        <td>2022-11-27 16:18:06</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eaabe0aafdf26a8d88e7/deploy/s3/prod/reports/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_educ_edu_pt_s4_osm_pp_school</td>
+        <td>clean</td>
+        <td>2022-11-27 16:14:15</td>
         <td>completed</td>
-        <td>2022-11-27 15:50:26</td>
-        <td>0:00:11.038665</td>
+        <td>2022-11-27 16:14:15</td>
+        <td>0:00:03</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/7cdfa5b06412c80354d9/clean/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_phys_dam_pt_s4_osm_pp_dam</td>
+        <td>db/table/powerlines_proximity_h3_r8</td>
+        <td>2022-11-24 19:01:53</td>
         <td>completed</td>
-        <td>2022-11-27 15:50:14</td>
-        <td>0:00:09.896980</td>
+        <td>2022-11-24 19:01:53</td>
+        <td>0:52:24</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/eebe2e5d206c25c51819/db/table/powerlines_proximity_h3_r8/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_tran_rrd_ln_s4_osm_pp_subwaytram</td>
+        <td>deploy/prod/cleanup_cache</td>
+        <td>2022-11-24 00:54:27</td>
         <td>completed</td>
-        <td>2022-11-27 15:50:05</td>
-        <td>0:00:09.492871</td>
+        <td>2022-11-24 00:54:27</td>
+        <td>0:00:01</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/aa6ff7556bf027555d30/deploy/prod/cleanup_cache/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_tran_rrd_ln_s4_osm_pp_railways</td>
+        <td>prod</td>
+        <td>2022-11-24 00:54:27</td>
         <td>completed</td>
-        <td>2022-11-27 15:49:56</td>
-        <td>0:00:11.151159</td>
+        <td>2022-11-24 00:54:27</td>
+        <td>0:00:00</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/aa6ff7556bf027555d30/prod/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_tran_rds_ln_s4_osm_pp_roads</td>
+        <td>db/table/populated_areas_proximity_h3</td>
+        <td>2022-11-23 12:50:49</td>
         <td>completed</td>
-        <td>2022-11-27 15:49:45</td>
-        <td>0:08:50.764615</td>
+        <td>2022-11-23 12:50:49</td>
+        <td>0:58:42</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/aa6ff7556bf027555d30/db/table/populated_areas_proximity_h3/log.txt">...</a></td>
       </tr>
       <tr class="completed">
-        <td>tza_tran_rds_ln_s4_osm_pp_mainroads</td>
+        <td>db/table/power_substations_proximity_h3</td>
+        <td>2022-11-23 09:49:32</td>
         <td>completed</td>
-        <td>2022-11-27 15:40:54</td>
-        <td>0:00:33.898545</td>
+        <td>2022-11-23 09:49:32</td>
+        <td>1:11:59</td>
+        <td> <a href ="https://geocint.kontur.io/geocint/logs/aa6ff7556bf027555d30/db/table/power_substations_proximity_h3/log.txt">...</a></td>
       </tr>
 </table>
 </body>
