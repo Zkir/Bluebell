@@ -9,7 +9,7 @@
 geoextent = blr
 
 define generate_file
-	status.py "started" "$@"
+	status.py target "$@" "started" "$<"
 	tools\osmfilter.exe 01_countries\$< $(2) -o=02_Interim_osm\$@.osm
 	if not exist "90_Output\$(geoextent)\$(1)" md 90_Output\$(geoextent)\$(1)
 	zOsm2GeoJSON\zOsm2GeoJSON.py 02_Interim_osm\$@.osm 90_Output\$(geoextent)\$(1)\$@.json --action=$(3) $(2)
@@ -19,20 +19,23 @@ define generate_file
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 91_Output_zipped\$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 91_Output_zipped\$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
 	tools\update_ckan.bat 90_Output\$(geoextent)\$(1)\$@.CKAN.json
-	status.py "completed" "$@"
+	status.py target "$@" "completed" 
 	echo $@ completed
 endef
 
-$(geoextent)_cmf: country_datasets
-	status.py "started" "$@"
+
+
+
+$(geoextent)_cmf: $(geoextent)_country_datasets
+	status.py target "$@" "started" "$<"
 	tools\zip_cmf_json.bat 90_Output\$(geoextent) 92_Output_cmf_zipped\$@_json.zip	
 	tools\zip_cmf_shp.bat  90_Output\$(geoextent) 92_Output_cmf_zipped\$@_shp.zip
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 92_Output_cmf_zipped\$@_json.zip s3://mekillot-backet/cmfs/$@_json.zip
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 92_Output_cmf_zipped\$@_shp.zip  s3://mekillot-backet/cmfs/$@_shp.zip	
 	tools\update_ckan.bat 92_Output_cmf_zipped\$@.CKAN.json
-	status.py "completed" "$@"
+	status.py target "$@" "completed" 
 
-country_datasets: $(geoextent)_tran_rds_ln_s4_osm_pp_mainroads \
+$(geoextent)_country_datasets: $(geoextent)_tran_rds_ln_s4_osm_pp_mainroads \
             $(geoextent)_tran_rds_ln_s4_osm_pp_roads \
             $(geoextent)_tran_rrd_ln_s4_osm_pp_railways \
             $(geoextent)_tran_rrd_ln_s4_osm_pp_subwaytram \
@@ -73,8 +76,10 @@ country_datasets: $(geoextent)_tran_rds_ln_s4_osm_pp_mainroads \
             $(geoextent)_admn_ad3_py_s4_osm_pp_adminboundary3 \
 
 #            $(geoextent)_bldg_bdg_py_s4_osm_pp_buildings
-			
+
+	status.py target "$@" "started" "$<"		
 	echo All layers completed OK
+	status.py target "$@" "completed"
 
 
 #roads	
@@ -250,7 +255,9 @@ $(geoextent)_tran_air_pt_s4_osm_pp_airports: $(geoextent).o5m
 #==================Country ==================================================================
 
 $(geoextent).o5m:
+	status.py target "$@" "started" "$<"
 	echo assume that $@ exist
+	status.py target "$@" "completed" 
 
 
 $(geoextent)1.o5m:
