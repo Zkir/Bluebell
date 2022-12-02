@@ -40,6 +40,13 @@ zOsm2GeoJSON/__pycache__/*.*
 99_WebUI/make_profile.db
 99_WebUI/status.dat.bak
 
+Poly/**/*.json
+Poly/**/*.shp
+Poly/**/*.dbf
+Poly/**/*.shx
+Poly/**/*.prj
+Poly/**/*.cpg
+
 key.txt
 /antlr-based/
 zOsm2GeoJSON/test.py
@@ -53,3 +60,4 @@ tools/.wget-hsts
 tools/update_ckan.bat
 tools/ckan_test.bat
 tools/poly2wkt.py
+
