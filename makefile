@@ -6,13 +6,16 @@
 # feature.o5m --> feature.json: zOsm2GeoJSON
 # feature.json --> feature.shp: ogr2ogr 
 
-geoextent = blr
+vpath %.o5m 20_Countries 10_Planet
+vpath %.pbf 20_Countries 10_Planet
+
+geoextent = tza
 
 define generate_file
 	status.py target "$@" "started" "$<"
-	tools\osmfilter.exe 01_countries\$< $(2) -o=02_Interim_osm\$@.osm
+	tools\osmfilter.exe 20_Countries\$(geoextent).o5m $(2) -o=30_Interim_osm\$@.osm
 	if not exist "90_Output\$(geoextent)\$(1)" md 90_Output\$(geoextent)\$(1)
-	zOsm2GeoJSON\zOsm2GeoJSON.py 02_Interim_osm\$@.osm 90_Output\$(geoextent)\$(1)\$@.json --action=$(3) $(2)
+	zOsm2GeoJSON\zOsm2GeoJSON.py 30_Interim_osm\$@.osm 90_Output\$(geoextent)\$(1)\$@.json --action=$(3) $(2)
 	c:\OSGeo4W\bin\ogr2ogr.exe  -lco ENCODING=UTF8 -skipfailures 90_Output\$(geoextent)\$(1)\$@.shp 90_Output\$(geoextent)\$(1)\$@.json
         tools\zip_json.bat 90_Output\$(geoextent)\$(1)\$@.json 91_Output_zipped\$@.json.zip
         tools\zip_shp.bat  90_Output\$(geoextent)\$(1)\$@      91_Output_zipped\$@.shp.zip
@@ -230,21 +233,6 @@ $(geoextent)_wash_wts_pt_s4_osm_pp_water_source: $(geoextent).o5m
 $(geoextent)_wash_toi_pt_s4_osm_pp_toilets: $(geoextent).o5m 
 	$(call generate_file,234_wash, --keep="amenity=toilets",write_poi)
 
-#admin boundaries
-# should be both lines and polygons
-
-$(geoextent)_admn_ad0_py_s4_osm_pp_adminboundary0: $(geoextent).o5m
-	$(call generate_file,202_admn, --keep="( boundary=administrative ) and ( admin_level=2 )",write_poly)
-
-$(geoextent)_admn_ad1_py_s4_osm_pp_adminboundary1: $(geoextent).o5m
-	$(call generate_file,202_admn, --keep="boundary=administrative and admin_level=4",write_poly)
-
-$(geoextent)_admn_ad2_py_s4_osm_pp_adminboundary2: $(geoextent).o5m
-	$(call generate_file,202_admn, --keep="boundary=administrative and admin_level=6",write_poly)
-
-$(geoextent)_admn_ad3_py_s4_osm_pp_adminboundary3: $(geoextent).o5m
-	$(call generate_file,202_admn, --keep="( boundary=administrative ) and ( admin_level=7 or admin_level=8 or admin_level=9 or admin_level=10 )",write_poly)
-
 #coast lines 	
 $(geoextent)_elev_cst_ln_s4_osm_pp_coastline: $(geoextent).o5m
 	$(call generate_file,211_elev, --keep="natural=coastline",write_lines)
@@ -252,22 +240,45 @@ $(geoextent)_elev_cst_ln_s4_osm_pp_coastline: $(geoextent).o5m
 #airports	
 $(geoextent)_tran_air_pt_s4_osm_pp_airports: $(geoextent).o5m
 	$(call generate_file,232_tran, --keep="aeroway=aerodrome",write_poi)
+
+
+#admin boundaries
+# should be both lines and polygons
+
+$(geoextent)_admn_ad0_py_s4_osm_pp_adminboundary0: $(geoextent).o5m
+	$(call generate_file,202_admn, --keep= --keep-relations="( boundary=administrative ) and ( admin_level=2 )",write_poly)
+
+$(geoextent)_admn_ad1_py_s4_osm_pp_adminboundary1: $(geoextent).o5m
+	$(call generate_file,202_admn, --keep= --keep-relations="boundary=administrative and admin_level=4",write_poly)
+
+$(geoextent)_admn_ad2_py_s4_osm_pp_adminboundary2: $(geoextent).o5m
+	$(call generate_file,202_admn, --keep= --keep-relations="boundary=administrative and admin_level=5",write_poly)
+
+$(geoextent)_admn_ad3_py_s4_osm_pp_adminboundary3: $(geoextent).o5m
+	$(call generate_file,202_admn, --keep= --keep-relations="( boundary=administrative ) and ( admin_level=6 or admin_level=7 or admin_level=8 or admin_level=9 or admin_level=10 )",write_poly)
+
+
 #==================Country ==================================================================
 
-$(geoextent).o5m:
+$(geoextent)_1.o5m: 
 	status.py target "$@" "started" "$<"
 	echo assume that $@ exist
 	status.py target "$@" "completed" 
 
+$(geoextent).o5m: planet-latest.osm.pbf
+	status.py target "$@" "started" "$<"
+	osmium extract -s smart -p Poly\$(geoextent).poly 10_Planet\planet-latest.osm.pbf -o 20_Countries\$(geoextent).pbf --overwrite
+	osmconvert 20_Countries\$(geoextent).pbf -o=20_Countries\$(geoextent).o5m
+	status.py target "$@" "completed" 
 
 $(geoextent)1.o5m:
 	
-ifneq ("$(wildcard 01_countries\$(geoextent).o5m)","")
-	del 01_countries\$(geoextent)_old.o5m
-	ren 01_countries\$(geoextent).o5m $(geoextent)_old.o5m
-	osmupdate64 01_countries\$(geoextent)_old.o5m 01_countries\$(geoextent).o5m -B=poly\$(geoextent).poly -v
+ifneq ("$(wildcard 20_Countries\$(geoextent).o5m)","")
+	del 20_Countries\$(geoextent)_old.o5m
+	ren 20_Countries\$(geoextent).o5m $(geoextent)_old.o5m
+	osmupdate64 20_Countries\$(geoextent)_old.o5m 20_Countries\$(geoextent).o5m -B=poly\$(geoextent).poly -v
 else
-	osmconvert 00_Planet\planet-latest.osm.pbf --complete-ways --complete-multipolygons -B=poly\$(geoextent).poly -o=01_countries\$(geoextent).o5m
+	osmconvert 10_Planet\planet-latest.osm.pbf --complete-ways --complete-multipolygons -B=poly\$(geoextent).poly -o=20_Countries\$(geoextent).o5m
 endif
 	echo $@  completed
 
