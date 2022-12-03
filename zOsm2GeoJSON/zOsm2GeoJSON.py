@@ -3,93 +3,11 @@ import sys
 from datetime import datetime
 import os
 
-from mdlOsmParser import readOsmXml, encodeXmlString
+from mdlOsmParser    import readOsmXml
 from mdlFilterParser import parse_filter
 from mdlFilterParser import evaluate_tree
-from ma_dictionaries import Geoextent
-from ma_dictionaries import FeatureCategory
-
-
-def escapeJsonString(s):
-    s = s.replace("\"", "")
-    s = s.replace("'","")
-    s = s.replace("\\","\\\\") # single \ to double \\
-    return s
-
-def format_tag(s):
-    s = s.replace(" ", "_")
-    s = s.replace("/", "_")
-    return s.lower()
-
-#most uncertain part, we need to create parcer for osmfilter filter!     
-def evaluateFilter(object_filter, osmtags,object_type):
-    blnResult = evaluate_tree(object_filter, osmtags, object_type)
-    return blnResult
-
-
-def writeCKANJson(Objects, objOsmGeom, strOutputFileName, strAction, allowed_tags, strFilter, last_known_edit):
-    path, fname = os.path.split(strOutputFileName)
-    dataset_name = fname[0:-5] #this file name without extention
-    geoextent = fname[0:3]
-    category = fname[4:8]
-    theme = fname[9:12]
-    geometry_type = fname[13:15]
-    scale = fname[16:18]
-    permission = fname[23:25]
-    dataset_hum_name = fname[26:-5]
-
-
-    short_geoextent = Geoextent[geoextent]
-    # dataset_title = geoextent.upper() + ' ' + dataset_hum_name.upper()
-    dataset_title =  dataset_hum_name.upper() + ' -- ' + short_geoextent
-    dataset_description = 'This dataset contains ' + dataset_hum_name.upper() + \
-                          ', extracted from OpenStreetMap for ' + short_geoextent + '. There are ' + str( len(Objects)) + ' objects. ' +  \
-                          'Original filter is ' + strFilter + '. Last known edit timestamp: ' + last_known_edit
-
-    #it's not a json escaping, but  a particularly perverted bug of curl, it does not undertand equal sign
-    dataset_description = dataset_description.replace("=", '%3D')
-
-    strOutputFileName = os.path.join(path, dataset_name + '.CKAN.json')
-    fo = open(strOutputFileName, 'w', encoding="utf-8")
-
-    fo.write('{ \n')
-    fo.write('    "name": "' + escapeJsonString(dataset_name) + '",\n')
-    fo.write('    "title": "' + escapeJsonString(dataset_title) + '",\n')
-    fo.write('    "notes": "' + escapeJsonString(dataset_description) + '",\n')
-    fo.write('    "url": "Openstreetmap.org",\n')
-    fo.write('    "owner_org": "kontur",\n')
-    fo.write('    "license_id": "odc-odbl",\n')
-
-    fo.write('    "tags": [ \n')
-    fo.write('             {"vocabulary_id": null,  "display_name": "'+escapeJsonString(FeatureCategory[category])+'",  "name": "' + escapeJsonString(format_tag(FeatureCategory[category]))+'"},\n')
-    fo.write('             {"vocabulary_id": null,  "display_name": "osm",  "name": "osm"}], \n')
-
-    fo.write('    "groups": [{"name": "' + escapeJsonString(geoextent)+'"}\n')
-    fo.write('              ], \n')
-
-    fo.write('    "extras": [ \n')
-    fo.write('             {"key": "last_known_edit", "value": "' + escapeJsonString(last_known_edit) + '"},\n')
-    fo.write('             {"key": "geoextent",            "value": "' + escapeJsonString(geoextent) + '"},\n')
-    fo.write('             {"key": "category",             "value": "' + escapeJsonString(category) + '"},\n')
-    fo.write('             {"key": "theme",                "value": "' + escapeJsonString(theme) + '"}, \n')
-    fo.write('             {"key": "geometry_type",        "value": "' + escapeJsonString(geometry_type) + '"},\n')
-    fo.write('             {"key": "scale",                "value": "' + escapeJsonString(scale) + '"},\n')
-    fo.write('             {"key": "source",               "value": "osm"},\n')
-    fo.write('             {"key": "permission",           "value": "' + escapeJsonString(permission) + '"} ],\n')
-
-    fo.write('    "resources": [\n')
-    fo.write('        {"name":"'+escapeJsonString(dataset_title)+' in GeoJson format",\n')
-    fo.write('         "url":"https://mekillot-backet.website.yandexcloud.net/datasets/'+escapeJsonString(dataset_name)+'.json.zip",\n')
-    fo.write('         "format": "GeoJson"\n')
-    fo.write('        },')
-    fo.write('        {"name":"'+escapeJsonString(dataset_title)+' as ESRI shape",\n')
-    fo.write('         "url":"https://mekillot-backet.website.yandexcloud.net/datasets/'+escapeJsonString(dataset_name)+'.shp.zip",\n')
-    fo.write('         "format": "ESRI shape"\n')
-    fo.write('        }]\n')
-
-    fo.write('} \n')
-    fo.close()
-
+from writeCKANjson   import escapeJsonString
+from writeCKANjson   import writeCKANJson
 
 def writeGeoJson(Objects, objOsmGeom, strOutputFile, strAction, allowed_tags, strFilter,last_known_edit):
     
@@ -216,10 +134,15 @@ def writeGeoJson(Objects, objOsmGeom, strOutputFile, strAction, allowed_tags, st
     fo.write('    ]\n') 
     fo.write('}\n') 
     fo.close()
-    print ("Completed: "+str(j)+" objects written")
+    print("Completed: "+str(j)+" objects written")
 
 
-# lets's filter out something, we are interested only in particular objects
+# just call evaluate tree from mdlFilterParser
+def evaluateFilter(object_filter, osmtags, object_type):
+    blnResult = evaluate_tree(object_filter, osmtags, object_type)
+    return blnResult
+
+# Lets's filter out something, we are interested only in particular objects
 def filterObjects(Objects, object_filter, strAction):
     SelectedObjects = []
     last_known_edit = ''
@@ -311,8 +234,7 @@ def createJson(strInputOsmFile, strOutputFileName,strAction,strFilter):
     allowed_tags = writeTagStatistics(strOutputFileName+'.stat.txt',SelectedObjects)
 
     writeGeoJson(SelectedObjects, objOsmGeom, strOutputFileName, strAction, allowed_tags, strFilter,last_known_edit)
-    writeCKANJson(SelectedObjects, objOsmGeom, strOutputFileName, strAction, allowed_tags, strFilter,last_known_edit)
-
+    writeCKANJson(strOutputFileName, len(SelectedObjects), strFilter, last_known_edit)
 
     t2 = time.time()
     print("File " + strInputOsmFile + " processed in "+str(t2-t1)+" seconds")

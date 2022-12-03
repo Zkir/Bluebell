@@ -1,4 +1,7 @@
 geoextent = tza
+#=================================================================================================
+# Definitions
+#=================================================================================================
 
 define generate_dataset_from_shp
 	status.py target "$@" "started" "$<"
@@ -7,6 +10,7 @@ define generate_dataset_from_shp
 	c:\OSGeo4W\bin\ogr2ogr.exe -skipfailures 90_Output\$(geoextent)\$(1)\$@.json 90_Output\$(geoextent)\$(1)\$@.shp
 	tools\zip_json.bat 90_Output\$(geoextent)\$(1)\$@.json 91_Output_zipped\$@.json.zip
 	tools\zip_shp.bat  90_Output\$(geoextent)\$(1)\$@      91_Output_zipped\$@.shp.zip
+	zOsm2GeoJSON\writeCKANjson.py "90_Output\$(geoextent)\$(1)\$@.json"
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 91_Output_zipped\$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 91_Output_zipped\$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
 	tools\update_ckan.bat 90_Output\$(geoextent)\$(1)\$@.CKAN.json
@@ -21,6 +25,7 @@ define generate_dataset_from_csv
 	if not exist "90_Output\$(geoextent)\$(1)" md 90_Output\$(geoextent)\$(1)
 	c:\OSGeo4W\bin\ogr2ogr.exe -s_srs EPSG:4326 -t_srs EPSG:3857 -oo X_POSSIBLE_NAMES=lon* -oo Y_POSSIBLE_NAMES=lat* -lco ENCODING=UTF8 -clipsrc poly\$(geoextent).shp  -f "ESRI Shapefile" 90_Output\$(geoextent)\$(1)\$@.shp $<
 	c:\OSGeo4W\bin\ogr2ogr.exe -skipfailures 90_Output\$(geoextent)\$(1)\$@.json 90_Output\$(geoextent)\$(1)\$@.shp
+	zOsm2GeoJSON\writeCKANjson.py "90_Output\$(geoextent)\$(1)\$@.json"
 	tools\zip_json.bat 90_Output\$(geoextent)\$(1)\$@.json 91_Output_zipped\$@.json.zip
 	tools\zip_shp.bat  90_Output\$(geoextent)\$(1)\$@      91_Output_zipped\$@.shp.zip
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 91_Output_zipped\$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
@@ -29,13 +34,16 @@ define generate_dataset_from_csv
 	status.py target "$@" "completed" 
 endef
 
+#=================================================================================================
+# Abstract final target
+#=================================================================================================
 all:  tza_tran_rds_ln_s0_naturalearth_pp_roads \
       tza_stle_stl_pt_s0_naturalearth_pp_maincities \
       tza_phys_riv_ln_s0_naturalearth_pp_rivers \
       tza_phys_lak_py_s0_naturalearth_pp_waterbodies \
       tza_elev_cst_ln_s0_naturalearth_pp_coastline \
-      tza_tran_air_pt_s0_ourairports_pp \
-      tza_tran_por_pt_s0_worldports_pp \
+      tza_tran_air_pt_s0_ourairports_pp_airports \
+      tza_tran_por_pt_s0_worldports_pp_ports \
       tza_tran_rrd_ln_s0_wfp_pp_railways\
       tza_util_pst_pt_s0_gppd_pp_powerplants
 
@@ -77,15 +85,23 @@ tza_elev_cst_ln_s0_naturalearth_pp_coastline:  12_Downloads/natural_earth/ne_10m
 # Our Airports
 #=================================================================================================
 #from CSV file
-tza_tran_air_pt_s0_ourairports_pp: 12_Downloads/ourairports/airports.csv
+tza_tran_air_pt_s0_ourairports_pp_airports: 12_Downloads/ourairports/airports.csv
 	$(call generate_dataset_from_csv,232_tran)
+
+12_Downloads/ourairports/airports.csv:
+	if not exist "12_Downloads/ourairports" md "12_Downloads/ourairports/"
+	curl "https://davidmegginson.github.io/ourairports-data/airports.csv" -o "$@"
 
 #=================================================================================================
 # World Ports
 #=================================================================================================
 #from CSV file
-tza_tran_por_pt_s0_worldports_pp: 12_Downloads/worldports/UpdatedPub150.csv
+tza_tran_por_pt_s0_worldports_pp_ports: 12_Downloads/worldports/UpdatedPub150.csv
 	$(call generate_dataset_from_csv,232_tran)
+
+12_Downloads/worldports/UpdatedPub150.csv: 
+	if not exist "12_Downloads/worldports" md "12_Downloads/worldports/"
+	curl "https://msi.nga.mil/api/publications/download?type=view&key=16920959/SFH00000/UpdatedPub150.csv" -o "$@"
 
 #=================================================================================================
 # WFP Railroads

@@ -61,3 +61,4 @@ tools/update_ckan.bat
 tools/ckan_test.bat
 tools/poly2wkt.py
 
+test.bat
