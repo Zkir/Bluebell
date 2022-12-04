@@ -62,3 +62,5 @@ tools/ckan_test.bat
 tools/poly2wkt.py
 
 test.bat
+12_Downloads/Kontur/kontur_boundaries_20220407.gpkg
+99_WebUI/tzacompleteness.html
