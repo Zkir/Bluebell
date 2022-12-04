@@ -241,8 +241,8 @@ Geoextent = {
     "tun": "Tunisia",  # Country
     "tur": "Turkey",  # Country
     "tuv": "Tuvalu",  # Country
-    "twn": "Taiwan, Province of China",  # Country
-    "tza": "Tanzania, United Republic of",  # Country
+    "twn": "Taiwan (Province of China)",  # Country
+    "tza": "Tanzania (United Republic of)",  # Country
     "uga": "Uganda",  # Country
     "ukr": "Ukraine",  # Country
     "umi": "United States Minor Outlying Islands",  # Country
