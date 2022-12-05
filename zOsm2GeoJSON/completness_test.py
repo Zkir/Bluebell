@@ -48,7 +48,6 @@ def get_datasets_filenames2(geoextent, files_folder):
             if (file[0:3] == geoextent) or (file[0:3] == 'reg'):
                 dataset_name = file.split('.')[0]
                 if datasets.count(dataset_name) == 0:
-                    print (dataset_name)
                     datasets.append(dataset_name)
 
 

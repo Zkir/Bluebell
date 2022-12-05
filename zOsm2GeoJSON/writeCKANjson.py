@@ -19,7 +19,7 @@ def format_tag(s):
 # we need to create file with metadate, to create dataset on CKAN, with metadata, tags and so forth.
 def writeCKANJson(strOutputFileName, number_of_objects, strFilter, last_known_edit):
     path, fname = os.path.split(strOutputFileName)
-    dataset_name = fname[0:-5]  # this file name without extention
+    dataset_name = fname.split('.')[0]  # this file name without extention
     codes = dataset_name.split("_",7)
 
     geoextent = codes[0]
@@ -78,9 +78,6 @@ def writeCKANJson(strOutputFileName, number_of_objects, strFilter, last_known_ed
         fo.write('    "url": "https://ourairports.com/data",\n')
         # fo.write('    "license_id": "odc-odbl",\n')
 
-
-
-
     fo.write('    "tags": [ \n')
     fo.write('             {"vocabulary_id": null,  "display_name": "'+escapeJsonString(FeatureCategory[category])+'",  "name": "' + escapeJsonString(format_tag(FeatureCategory[category]))+'"},\n')
     fo.write('             {"vocabulary_id": null,  "display_name": "'+ escapeJsonString(source) +'",  "name": "'+ escapeJsonString(format_tag(source)) +'"}], \n')
@@ -99,14 +96,30 @@ def writeCKANJson(strOutputFileName, number_of_objects, strFilter, last_known_ed
     fo.write('             {"key": "permission",           "value": "' + escapeJsonString(permission) + '"} ],\n')
 
     fo.write('    "resources": [\n')
-    fo.write('        {"name":"'+escapeJsonString(dataset_title)+' in GeoJson format",\n')
-    fo.write('         "url":"https://mekillot-backet.website.yandexcloud.net/datasets/'+escapeJsonString(dataset_name)+'.json.zip",\n')
-    fo.write('         "format": "GeoJson"\n')
-    fo.write('        },\n')
-    fo.write('        {"name":"'+escapeJsonString(dataset_title)+' as ESRI shape",\n')
-    fo.write('         "url":"https://mekillot-backet.website.yandexcloud.net/datasets/'+escapeJsonString(dataset_name)+'.shp.zip",\n')
-    fo.write('         "format": "ESRI shape"\n')
-    fo.write('        }]\n')
+    if geometry_type in ['pt','py','ln']:
+        fo.write('        {"name":"'+escapeJsonString(dataset_title)+' in GeoJson format",\n')
+        fo.write('         "url":"https://mekillot-backet.website.yandexcloud.net/datasets/'+escapeJsonString(dataset_name)+'.json.zip",\n')
+        fo.write('         "format": "GeoJson"\n')
+        fo.write('        },\n')
+        fo.write('        {"name":"'+escapeJsonString(dataset_title)+' as ESRI shape",\n')
+        fo.write('         "url":"https://mekillot-backet.website.yandexcloud.net/datasets/'+escapeJsonString(dataset_name)+'.shp.zip",\n')
+        fo.write('         "format": "ESRI shape"\n')
+        fo.write('        }\n')
+    elif geometry_type == 'ras':
+        fo.write('        {"name":"' + escapeJsonString(dataset_title) + ' in TIFF format",\n')
+        fo.write('         "url":"https://mekillot-backet.website.yandexcloud.net/datasets/' + escapeJsonString(
+            dataset_name) + '.tif.zip",\n')
+        fo.write('         "format": "TIFF"\n')
+        fo.write('        },\n')
+    elif geometry_type == 'tab':
+        fo.write('        {"name":"' + escapeJsonString(dataset_title) + ' in CSV format",\n')
+        fo.write('         "url":"https://mekillot-backet.website.yandexcloud.net/datasets/' + escapeJsonString(
+            dataset_name) + '.csv.zip",\n')
+        fo.write('         "format": "CSV"\n')
+        fo.write('        },\n')
+    else:
+        raise Exception ('Unknown geomety type: '+str(geometry_type))
+    fo.write('        ]\n')
 
     fo.write('} \n')
     fo.close()

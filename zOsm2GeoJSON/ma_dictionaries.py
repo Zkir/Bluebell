@@ -416,6 +416,7 @@ FeatureSource = {
     "undac": "UN Disaster Assessment Coordination",
     "undp": "UN Development Program",
     "unfis": "UN-OCHA Field Information Services",
+    "unfpa": "UN Population Fund",
     "ungiwg": "UNGIWG Core Geodatabase",
     "unhic": "UN Humanitarian Information Centre",
     "unicef": "UNICEF",

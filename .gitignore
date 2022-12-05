@@ -17,6 +17,7 @@ zOsm2GeoJSON/__pycache__/*.*
 12_Downloads/**/*.html
 12_Downloads/**/*.pdf
 12_Downloads/**/*.cst
+12_Downloads/**/*.tif
 
 20_Countries/1.bat
 20_Countries/*.pbf
@@ -30,6 +31,9 @@ zOsm2GeoJSON/__pycache__/*.*
 90_Output/**/*.shx
 90_Output/**/*.prj
 90_Output/**/*.cpg
+90_Output/**/*.csv
+90_Output/**/*.tif
+
 90_Output/**/*.stat.txt
 91_Output_zipped/*.zip
 92_Output_cmf_zipped/*.zip
