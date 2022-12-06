@@ -118,17 +118,72 @@ def writeCKANJson(strOutputFileName, number_of_objects, strFilter, last_known_ed
         fo.write('         "format": "CSV"\n')
         fo.write('        },\n')
     else:
-        raise Exception ('Unknown geomety type: '+str(geometry_type))
+        raise Exception ('Unknown geometry type: '+str(geometry_type))
     fo.write('        ]\n')
 
     fo.write('} \n')
     fo.close()
 
 
+def writeCKANJsonCMF(strOutputFileName):
+    path, fname = os.path.split(strOutputFileName)
+    dataset_name = fname.split('.')[0]  # this file name without extention
+    codes = dataset_name.split("_", 7)
+
+    geoextent = codes[0]
+
+    short_geoextent = Geoextent[geoextent]
+
+
+    strOutputFileName = os.path.join(path, dataset_name + '.CKAN.json')
+    fo = open(strOutputFileName, 'w', encoding="utf-8")
+    fo.write('{ \n')
+    fo.write('    "name": "'+dataset_name+'",\n')
+    fo.write('    "title": "'+short_geoextent+' Crash Move Folder",\n')
+    fo.write('    "notes": "This dataset contains '+ short_geoextent+' Crash Move Folder. Various layers are combined. This dataset is intended to be used for map making",\n')
+    fo.write('    "url": "mapaction.org",\n')
+    fo.write('    "owner_org": "kontur",\n')
+    fo.write('    "tags": [\n')
+    fo.write('             {"vocabulary_id": null,  "display_name": "cmf",  "name": "cmf"}\n')
+    fo.write('            ], \n')
+    fo.write('    "groups": [{"name": "'+geoextent+'"}\n')
+    fo.write('              ], \n')
+    fo.write('    "extras": [ \n')
+    fo.write('             {"key": "last_known_edit", "value": "unknown"},\n')
+    fo.write('             {"key": "geoextent",            "value": "'+ geoextent +'"},\n')
+    fo.write('             {"key": "source",               "value": "osm"},\n')
+    fo.write('             {"key": "permission",           "value": "pp"} ],\n')
+    fo.write('    "resources": [\n')
+    fo.write('        {"name":"'+short_geoextent+' Crash Move Folder in GeoJson format",\n')
+    fo.write('         "url":"https://mekillot-backet.website.yandexcloud.net/cmfs/'+geoextent+'_cmf_json.zip",\n')
+    fo.write('         "format": "GeoJson"\n')
+    fo.write('        },\n')
+    fo.write('        {"name":"'+short_geoextent+' Crash Move Folder as ESRI shape",\n')
+    fo.write('         "url":"https://mekillot-backet.website.yandexcloud.net/cmfs/'+geoextent+'_cmf_shp.zip",\n')
+    fo.write('         "format": "ESRI shape"\n')
+    fo.write('        }]\n')
+    fo.write('}\n')
+
+    fo.close()
+    return None
+
+
 def main():
     strInputFileName = sys.argv[1]
-    writeCKANJson(strInputFileName, "Unknown", "", "Unknown")
+    path, fname = os.path.split(strInputFileName)
+    
+    if len(fname.split("_")) == 2:
+        command = 'cmf'
+    else:
+        command = 'dataset'
 
+
+    if command == 'dataset':
+        writeCKANJson(strInputFileName, "Unknown", "", "Unknown")
+    elif command =='cmf':
+        writeCKANJsonCMF(strInputFileName)
+    else:
+        raise Exception('Unknown command "' + command + '". Allowed commands are "dataset" and "cmf"')
 
 if __name__ == '__main__':
     main()
