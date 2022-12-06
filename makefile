@@ -76,7 +76,8 @@ $(geoextent)_cmf: $(geoextent)_osm_datasets $(geoextent)_non_osm_datasets
 #=================================================================================================
 # Symbolic target for OSM based datasets
 #=================================================================================================
-$(geoextent)_osm_datasets: $(geoextent)_tran_rds_ln_s4_osm_pp_mainroads \
+$(geoextent)_osm_datasets: \
+            $(geoextent)_tran_rds_ln_s4_osm_pp_mainroads \
             $(geoextent)_tran_rds_ln_s4_osm_pp_roads \
             $(geoextent)_tran_rrd_ln_s4_osm_pp_railways \
             $(geoextent)_tran_rrd_ln_s4_osm_pp_subwaytram \
@@ -116,7 +117,6 @@ $(geoextent)_osm_datasets: $(geoextent)_tran_rds_ln_s4_osm_pp_mainroads \
             $(geoextent)_admn_ad2_py_s4_osm_pp_adminboundary2 \
             $(geoextent)_admn_ad3_py_s4_osm_pp_adminboundary3 \
 #            $(geoextent)_bldg_bdg_py_s4_osm_pp_buildings
-
 	echo OSM layers completed OK
 
 
@@ -377,6 +377,20 @@ $(geoextent)_elev_cst_ln_s0_naturalearth_pp_coastline:  12_Downloads/natural_ear
 12_Downloads/natural_earth/ne_10m_populated_places : 11_Downloads_zip/ne_10m_populated_places.zip
 	unzip "$<" "$@"
 
+11_Downloads_zip/ne_10m_rivers_lake_centerlines.zip:
+	curl "https://naciscdn.org/naturalearth/10m/physical/ne_10m_rivers_lake_centerlines.zip" -o "$@"
+
+11_Downloads_zip/ne_10m_coastline.zip :
+	curl "https://naciscdn.org/naturalearth/10m/physical/ne_10m_coastline.zip" -o "$@"
+
+11_Downloads_zip/ne_10m_roads.zip:
+	curl "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_roads.zip" -o "$@"
+
+11_Downloads_zip/ne_10m_populated_places.zip:
+	curl "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_populated_places.zip" -o "$@"
+
+11_Downloads_zip/ne_10m_lakes.zip: 
+	curl "https://naciscdn.org/naturalearth/10m/physical/ne_10m_lakes.zip" -o "$@"
 #=================================================================================================
 # Our Airports
 #=================================================================================================
