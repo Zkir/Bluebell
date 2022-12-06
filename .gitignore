@@ -1,48 +1,17 @@
 .idea/
 __pycache__/*.*
 zOsm2GeoJSON/__pycache__/*.*
-10_Planet/osmupdate_temp
-10_Planet/planet-latest.osm.pbf
-10_Planet/planet.osm.pbf
-10_Planet/update.bat
-11_Downloads_zip/*.zip
+data/in/**/*.*
+data/mid/**/*.*
+data/out/**/*.*
+data/vtargets
 
-12_Downloads/**/*.shp
-12_Downloads/**/*.dbf
-12_Downloads/**/*.shx
-12_Downloads/**/*.prj
-12_Downloads/**/*.cpg
-12_Downloads/**/*.csv
-12_Downloads/**/*.txt
-12_Downloads/**/*.html
-12_Downloads/**/*.pdf
-12_Downloads/**/*.cst
-12_Downloads/**/*.tif
-
-20_Countries/1.bat
-20_Countries/*.pbf
-20_Countries/*.o5m
-20_Countries/tza.o5m.bak
-30_Interim_osm/*.osm
 96-Sample
-90_Output/**/*.json
-90_Output/**/*.shp
-90_Output/**/*.dbf
-90_Output/**/*.shx
-90_Output/**/*.prj
-90_Output/**/*.cpg
-90_Output/**/*.csv
-90_Output/**/*.tif
-
-90_Output/**/*.stat.txt
-91_Output_zipped/*.zip
-92_Output_cmf_zipped/*.zip
-92_Output_cmf_zipped/*.CKAN.json
-
 99_WebUI/status.dat
 99_WebUI/index.html
 99_WebUI/make_profile.db
 99_WebUI/status.dat.bak
+99_WebUI/tzacompleteness.html
 
 Poly/**/*.json
 Poly/**/*.shp
@@ -52,7 +21,7 @@ Poly/**/*.prj
 Poly/**/*.cpg
 
 key.txt
-/antlr-based/
+
 zOsm2GeoJSON/test.py
 
 tools/1.bat
@@ -66,6 +35,6 @@ tools/ckan_test.bat
 tools/poly2wkt.py
 
 test.bat
-12_Downloads/Kontur/kontur_boundaries_20220407.gpkg
-99_WebUI/tzacompleteness.html
-12_Downloads/Kontur/kontur_boundaries_RU_20220407.gpkg
+
+
+

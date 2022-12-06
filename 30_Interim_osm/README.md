@@ -1,1 +1,0 @@
-In this folder all the intermediate osm files are put.

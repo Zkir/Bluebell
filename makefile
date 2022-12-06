@@ -6,8 +6,10 @@
 # feature.o5m --> feature.json: zOsm2GeoJSON
 # feature.json --> feature.shp: ogr2ogr 
 
-vpath %.o5m 20_Countries 10_Planet
-vpath %.pbf 20_Countries 10_Planet
+
+vpath %.pbf data\in\mapaction\per_country_pbf data\in\planet.osm
+vpath %.o5m data\in\mapaction\per_country_pbf data\in\planet.osm
+vpath % data\vtargets  
 
 geoextent = tza
 
@@ -17,47 +19,50 @@ geoextent = tza
 # Generate dataset (json+shp) from OSM file
 define generate_dataset_from_osm
 	status.py target "$@" "started" "$<"
-	tools\osmfilter.exe 20_Countries\$(geoextent).o5m $(2) -o=30_Interim_osm\$@.osm
-	if not exist "90_Output\$(geoextent)\$(1)" md 90_Output\$(geoextent)\$(1)
-	zOsm2GeoJSON\zOsm2GeoJSON.py 30_Interim_osm\$@.osm 90_Output\$(geoextent)\$(1)\$@.json --action=$(3) $(2)
-	c:\OSGeo4W\bin\ogr2ogr.exe  -lco ENCODING=UTF8 -skipfailures 90_Output\$(geoextent)\$(1)\$@.shp 90_Output\$(geoextent)\$(1)\$@.json
-        tools\zip_json.bat 90_Output\$(geoextent)\$(1)\$@.json 91_Output_zipped\$@.json.zip
-        tools\zip_shp.bat  90_Output\$(geoextent)\$(1)\$@      91_Output_zipped\$@.shp.zip
-	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 91_Output_zipped\$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
-	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 91_Output_zipped\$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
-	tools\update_ckan.bat 90_Output\$(geoextent)\$(1)\$@.CKAN.json
-	status.py target "$@" "completed" 
+	tools\osmfilter.exe data\in\mapaction\per_country_pbf\$(geoextent).o5m $(2) -o=data\mid\interim_osm\$@.osm
+	if not exist "data\out\mapaction\datasets\$(geoextent)\$(1)" md data\out\mapaction\datasets\$(geoextent)\$(1)
+	zOsm2GeoJSON\zOsm2GeoJSON.py data\mid\interim_osm\$@.osm data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json --action=$(3) $(2)
+	c:\OSGeo4W\bin\ogr2ogr.exe  -lco ENCODING=UTF8 -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json
+        tools\zip_json.bat data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\zipped\$@.json.zip
+        tools\zip_shp.bat  data\out\mapaction\datasets\$(geoextent)\$(1)\$@      data\out\mapaction\zipped\$@.shp.zip
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data\out\mapaction\zipped\$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data\out\mapaction\zipped\$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
+	tools\update_ckan.bat data\out\mapaction\datasets\$(geoextent)\$(1)\$@.CKAN.json
+	status.py target "$@" "completed"
+        touch data\vtargets\$(@F)   
 	echo $@ completed
 endef
 
 # Generate dataset (json+shp) from SHP file, + clipping
 define generate_dataset_from_shp
 	status.py target "$@" "started" "$<"
-	if not exist "90_Output\$(geoextent)\$(1)" md 90_Output\$(geoextent)\$(1)
-	c:\OSGeo4W\bin\ogr2ogr.exe -clipsrc poly\$(geoextent).shp -lco ENCODING=UTF8 -skipfailures 90_Output\$(geoextent)\$(1)\$@.shp $<\$(<F).shp
-	c:\OSGeo4W\bin\ogr2ogr.exe -skipfailures 90_Output\$(geoextent)\$(1)\$@.json 90_Output\$(geoextent)\$(1)\$@.shp
-	tools\zip_json.bat 90_Output\$(geoextent)\$(1)\$@.json 91_Output_zipped\$@.json.zip
-	tools\zip_shp.bat  90_Output\$(geoextent)\$(1)\$@      91_Output_zipped\$@.shp.zip
-	zOsm2GeoJSON\writeCKANjson.py "90_Output\$(geoextent)\$(1)\$@.json"
-	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 91_Output_zipped\$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
-	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 91_Output_zipped\$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
-	tools\update_ckan.bat 90_Output\$(geoextent)\$(1)\$@.CKAN.json
+	if not exist "data\out\mapaction\datasets\$(geoextent)\$(1)" md data\out\mapaction\datasets\$(geoextent)\$(1)
+	c:\OSGeo4W\bin\ogr2ogr.exe -clipsrc static_data\mapaction_poly_files\$(geoextent).shp -lco ENCODING=UTF8 -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp $<\$(<F).shp
+	c:\OSGeo4W\bin\ogr2ogr.exe -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp
+	tools\zip_json.bat data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\zipped\$@.json.zip
+	tools\zip_shp.bat  data\out\mapaction\datasets\$(geoextent)\$(1)\$@      data\out\mapaction\zipped\$@.shp.zip
+	zOsm2GeoJSON\writeCKANjson.py "data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json"
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data\out\mapaction\zipped\$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data\out\mapaction\zipped\$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
+	tools\update_ckan.bat data\out\mapaction\datasets\$(geoextent)\$(1)\$@.CKAN.json
 	status.py target "$@" "completed" 
+        touch data\vtargets\$(@F)
 endef
 
 # Generate dataset (json+shp) from CSV file, + clipping
 define generate_dataset_from_csv
 	status.py target "$@" "started" "$<"
-	if not exist "90_Output\$(geoextent)\$(1)" md 90_Output\$(geoextent)\$(1)
-	c:\OSGeo4W\bin\ogr2ogr.exe -s_srs EPSG:4326 -t_srs EPSG:3857 -oo X_POSSIBLE_NAMES=lon* -oo Y_POSSIBLE_NAMES=lat* -lco ENCODING=UTF8 -clipsrc poly\$(geoextent).shp  -f "ESRI Shapefile" 90_Output\$(geoextent)\$(1)\$@.shp $<
-	c:\OSGeo4W\bin\ogr2ogr.exe -skipfailures 90_Output\$(geoextent)\$(1)\$@.json 90_Output\$(geoextent)\$(1)\$@.shp
-	zOsm2GeoJSON\writeCKANjson.py "90_Output\$(geoextent)\$(1)\$@.json"
-	tools\zip_json.bat 90_Output\$(geoextent)\$(1)\$@.json 91_Output_zipped\$@.json.zip
-	tools\zip_shp.bat  90_Output\$(geoextent)\$(1)\$@      91_Output_zipped\$@.shp.zip
-	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 91_Output_zipped\$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
-	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 91_Output_zipped\$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
-	tools\update_ckan.bat 90_Output\$(geoextent)\$(1)\$@.CKAN.json
+	if not exist "data\out\mapaction\datasets\$(geoextent)\$(1)" md data\out\mapaction\datasets\$(geoextent)\$(1)
+	c:\OSGeo4W\bin\ogr2ogr.exe -s_srs EPSG:4326 -t_srs EPSG:3857 -oo X_POSSIBLE_NAMES=lon* -oo Y_POSSIBLE_NAMES=lat* -lco ENCODING=UTF8 -clipsrc static_data\mapaction_poly_files\$(geoextent).shp  -f "ESRI Shapefile" data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp $<
+	c:\OSGeo4W\bin\ogr2ogr.exe -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp
+	zOsm2GeoJSON\writeCKANjson.py "data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json"
+	tools\zip_json.bat data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\zipped\$@.json.zip
+	tools\zip_shp.bat  data\out\mapaction\datasets\$(geoextent)\$(1)\$@      data\out\mapaction\zipped\$@.shp.zip
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data\out\mapaction\zipped\$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data\out\mapaction\zipped\$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
+	tools\update_ckan.bat data\out\mapaction\datasets\$(geoextent)\$(1)\$@.CKAN.json
 	status.py target "$@" "completed" 
+        touch data\vtargets\$(@F)
 endef
 
 
@@ -66,11 +71,14 @@ endef
 #=================================================================================================
 $(geoextent)_cmf: $(geoextent)_osm_datasets $(geoextent)_non_osm_datasets
 	status.py target "$@" "started" "$<"
-	tools\zip_cmf_json.bat 90_Output\$(geoextent) 92_Output_cmf_zipped\$@_json.zip	
-	tools\zip_cmf_shp.bat  90_Output\$(geoextent) 92_Output_cmf_zipped\$@_shp.zip
-	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 92_Output_cmf_zipped\$@_json.zip s3://mekillot-backet/cmfs/$@_json.zip
-	aws --endpoint-url=https://storage.yandexcloud.net s3 cp 92_Output_cmf_zipped\$@_shp.zip  s3://mekillot-backet/cmfs/$@_shp.zip	
-	tools\update_ckan.bat 92_Output_cmf_zipped\$@.CKAN.json
+	if not exist "data\out\mapaction\cmf_zipped" md data\out\mapaction\cmf_zipped
+	tools\zip_cmf_json.bat data\out\mapaction\datasets\$(geoextent) data\out\mapaction\cmf_zipped\$@_json.zip	
+	tools\zip_cmf_shp.bat  data\out\mapaction\datasets\$(geoextent) data\out\mapaction\cmf_zipped\$@_shp.zip
+	zOsm2GeoJSON\writeCKANjson.py "data\out\mapaction\cmf_zipped\$@"
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data\out\mapaction\cmf_zipped\$@_json.zip s3://mekillot-backet/cmfs/$@_json.zip
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data\out\mapaction\cmf_zipped\$@_shp.zip  s3://mekillot-backet/cmfs/$@_shp.zip	
+	tools\update_ckan.bat data\out\mapaction\cmf_zipped\$@.CKAN.json
+	touch data\vtargets\$(@F)
 	status.py target "$@" "completed" 
 
 #=================================================================================================
@@ -118,6 +126,7 @@ $(geoextent)_osm_datasets: \
             $(geoextent)_admn_ad3_py_s4_osm_pp_adminboundary3 \
 #            $(geoextent)_bldg_bdg_py_s4_osm_pp_buildings
 	echo OSM layers completed OK
+	touch data\vtargets\$(@F)
 
 
 #=================================================================================================
@@ -130,10 +139,11 @@ $(geoextent)_non_osm_datasets:  $(geoextent)_tran_rds_ln_s0_naturalearth_pp_road
                                 $(geoextent)_elev_cst_ln_s0_naturalearth_pp_coastline \
                                 $(geoextent)_tran_air_pt_s0_ourairports_pp_airports \
                                 $(geoextent)_tran_por_pt_s0_worldports_pp_ports \
-                                $(geoextent)_tran_rrd_ln_s0_wfp_pp_railways\
                                 $(geoextent)_util_pst_pt_s0_gppd_pp_powerplants
 
 	echo Non-osm layers completed OK
+	touch data\vtargets\$(@F)
+# $(geoextent)_tran_rrd_ln_s0_wfp_pp_railways\
 
 #=================================================================================================
 # OSM based datasets
@@ -323,18 +333,18 @@ $(geoextent)_1.o5m:
 
 $(geoextent).o5m: planet-latest.osm.pbf
 	status.py target "$@" "started" "$<"
-	osmium extract -s smart -p Poly\$(geoextent).poly 10_Planet\planet-latest.osm.pbf -o 20_Countries\$(geoextent).pbf --overwrite
-	osmconvert 20_Countries\$(geoextent).pbf -o=20_Countries\$(geoextent).o5m
+	osmium extract -s smart -p static_data\mapaction_poly_files\$(geoextent).poly 10_Planet\planet-latest.osm.pbf -o data\in\mapaction\per_country_pbf\$(geoextent).pbf --overwrite
+	osmconvert data\in\mapaction\per_country_pbf\$(geoextent).pbf -o=data\in\mapaction\per_country_pbf\$(geoextent).o5m
 	status.py target "$@" "completed" 
 
 $(geoextent)1.o5m:
 	
-ifneq ("$(wildcard 20_Countries\$(geoextent).o5m)","")
-	del 20_Countries\$(geoextent)_old.o5m
-	ren 20_Countries\$(geoextent).o5m $(geoextent)_old.o5m
-	osmupdate64 20_Countries\$(geoextent)_old.o5m 20_Countries\$(geoextent).o5m -B=poly\$(geoextent).poly -v
+ifneq ("$(wildcard data\in\mapaction\per_country_pbf\$(geoextent).o5m)","")
+	del data\in\mapaction\per_country_pbf\$(geoextent)_old.o5m
+	ren data\in\mapaction\per_country_pbf\$(geoextent).o5m $(geoextent)_old.o5m
+	osmupdate64 data\in\mapaction\per_country_pbf\$(geoextent)_old.o5m data\in\mapaction\per_country_pbf\$(geoextent).o5m -B=static_data\mapaction_poly_files\$(geoextent).poly -v
 else
-	osmconvert 10_Planet\planet-latest.osm.pbf --complete-ways --complete-multipolygons -B=poly\$(geoextent).poly -o=20_Countries\$(geoextent).o5m
+	osmconvert 10_Planet\planet-latest.osm.pbf --complete-ways --complete-multipolygons -B=static_data\mapaction_poly_files\$(geoextent).poly -o=data\in\mapaction\per_country_pbf\$(geoextent).o5m
 endif
 	echo $@  completed
 #=================================================================================================
@@ -347,88 +357,94 @@ endif
 # Natural Earth
 #=================================================================================================
 #from ESRI SHAPE FILE
-$(geoextent)_tran_rds_ln_s0_naturalearth_pp_roads: 12_Downloads/natural_earth/ne_10m_roads
+$(geoextent)_tran_rds_ln_s0_naturalearth_pp_roads: data\in\mapaction\natural_earth\ne_10m_roads
 	$(call generate_dataset_from_shp,232_tran)
 
-$(geoextent)_stle_stl_pt_s0_naturalearth_pp_maincities: 12_Downloads/natural_earth/ne_10m_populated_places
+$(geoextent)_stle_stl_pt_s0_naturalearth_pp_maincities: data\in\mapaction\natural_earth\ne_10m_populated_places
 	$(call generate_dataset_from_shp,229_stle)
 
-$(geoextent)_phys_riv_ln_s0_naturalearth_pp_rivers: 12_Downloads/natural_earth/ne_10m_rivers_lake_centerlines
+$(geoextent)_phys_riv_ln_s0_naturalearth_pp_rivers: data\in\mapaction\natural_earth\ne_10m_rivers_lake_centerlines
 	$(call generate_dataset_from_shp,221_phys)
 
-$(geoextent)_phys_lak_py_s0_naturalearth_pp_waterbodies: 12_Downloads/natural_earth/ne_10m_lakes
+$(geoextent)_phys_lak_py_s0_naturalearth_pp_waterbodies: data\in\mapaction\natural_earth\ne_10m_lakes
 	$(call generate_dataset_from_shp,221_phys)
 
-$(geoextent)_elev_cst_ln_s0_naturalearth_pp_coastline:  12_Downloads/natural_earth/ne_10m_coastline
+$(geoextent)_elev_cst_ln_s0_naturalearth_pp_coastline:  data\in\mapaction\natural_earth\ne_10m_coastline
 	$(call generate_dataset_from_shp,211_elev)
 
-12_Downloads/natural_earth/ne_10m_lakes:  11_Downloads_zip/ne_10m_lakes.zip
+data\in\mapaction\natural_earth\ne_10m_lakes:  data\in\mapaction\zipped\ne_10m_lakes.zip
 	unzip "$<" "$@"
 
-12_Downloads/natural_earth/ne_10m_rivers_lake_centerlines : 11_Downloads_zip/ne_10m_rivers_lake_centerlines.zip
+data\in\mapaction\natural_earth\ne_10m_rivers_lake_centerlines : data\in\mapaction\zipped\ne_10m_rivers_lake_centerlines.zip
 	unzip "$<" "$@"
 
-12_Downloads/natural_earth/ne_10m_coastline : 11_Downloads_zip/ne_10m_coastline.zip 
+data\in\mapaction\natural_earth\ne_10m_coastline : data\in\mapaction\zipped\ne_10m_coastline.zip 
 	unzip "$<" "$@"
 
-12_Downloads/natural_earth/ne_10m_roads: 11_Downloads_zip/ne_10m_roads.zip
+data\in\mapaction\natural_earth\ne_10m_roads: data\in\mapaction\zipped\ne_10m_roads.zip
 	unzip "$<" "$@"
 
-12_Downloads/natural_earth/ne_10m_populated_places : 11_Downloads_zip/ne_10m_populated_places.zip
+data\in\mapaction\natural_earth\ne_10m_populated_places : data\in\mapaction\zipped\ne_10m_populated_places.zip
 	unzip "$<" "$@"
 
-11_Downloads_zip/ne_10m_rivers_lake_centerlines.zip:
+data\in\mapaction\zipped\ne_10m_rivers_lake_centerlines.zip:
 	curl "https://naciscdn.org/naturalearth/10m/physical/ne_10m_rivers_lake_centerlines.zip" -o "$@"
 
-11_Downloads_zip/ne_10m_coastline.zip :
+data\in\mapaction\zipped\ne_10m_coastline.zip :
 	curl "https://naciscdn.org/naturalearth/10m/physical/ne_10m_coastline.zip" -o "$@"
 
-11_Downloads_zip/ne_10m_roads.zip:
+data\in\mapaction\zipped\ne_10m_roads.zip:
 	curl "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_roads.zip" -o "$@"
 
-11_Downloads_zip/ne_10m_populated_places.zip:
+data\in\mapaction\zipped\ne_10m_populated_places.zip:
 	curl "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_populated_places.zip" -o "$@"
 
-11_Downloads_zip/ne_10m_lakes.zip: 
+data\in\mapaction\zipped\ne_10m_lakes.zip: 
 	curl "https://naciscdn.org/naturalearth/10m/physical/ne_10m_lakes.zip" -o "$@"
 #=================================================================================================
 # Our Airports
 #=================================================================================================
 #from CSV file
-$(geoextent)_tran_air_pt_s0_ourairports_pp_airports: 12_Downloads/ourairports/airports.csv
+$(geoextent)_tran_air_pt_s0_ourairports_pp_airports: data\in\mapaction/ourairports/airports.csv
 	$(call generate_dataset_from_csv,232_tran)
 
-12_Downloads/ourairports/airports.csv:
-	if not exist "12_Downloads/ourairports" md "12_Downloads/ourairports/"
+data\in\mapaction/ourairports/airports.csv:
+	if not exist "data\in\mapaction/ourairports" md "data\in\mapaction/ourairports/"
 	curl "https://davidmegginson.github.io/ourairports-data/airports.csv" -o "$@"
 
 #=================================================================================================
 # World Ports
 #=================================================================================================
 #from CSV file
-$(geoextent)_tran_por_pt_s0_worldports_pp_ports: 12_Downloads/worldports/UpdatedPub150.csv
+$(geoextent)_tran_por_pt_s0_worldports_pp_ports: data\in\mapaction/worldports/UpdatedPub150.csv
 	$(call generate_dataset_from_csv,232_tran)
 
-12_Downloads/worldports/UpdatedPub150.csv: 
-	if not exist "12_Downloads/worldports" md "12_Downloads/worldports/"
+data\in\mapaction/worldports/UpdatedPub150.csv: 
+	if not exist "data\in\mapaction/worldports" md "data\in\mapaction/worldports/"
 	curl "https://msi.nga.mil/api/publications/download?type=view&key=16920959/SFH00000/UpdatedPub150.csv" -o "$@"
 
 #=================================================================================================
 # WFP Railroads
 #=================================================================================================
 #from ESRI SHAPE FILE
-$(geoextent)_tran_rrd_ln_s0_wfp_pp_railways: 12_Downloads/WFP/wld_trs_railways_wfp
+$(geoextent)_tran_rrd_ln_s0_wfp_pp_railways: data\in\mapaction/WFP/wld_trs_railways_wfp
 	$(call generate_dataset_from_shp,232_tran)
 
-12_Downloads/WFP/wld_trs_railways_wfp : 11_Downloads_zip/wld_trs_railways_wfp.zip
+data\in\mapaction/WFP/wld_trs_railways_wfp : data\in\mapaction\zipped\wld_trs_railways_wfp.zip
 	unzip "$<" "$@"
+
+data\in\mapaction\zipped\wld_trs_railways_wfp.zip:
+	curl "https://geonode.wfp.org/geoserver/wfs?format_options=charset%3AUTF-8&typename=geonode%3Awld_trs_railways_wfp&outputFormat=SHAPE-ZIP&version=1.0.0&service=WFS&request=GetFeature" -o "$@"
 
 #=================================================================================================
 # Global Power Plant Database
 #=================================================================================================
 #from CSV file
-$(geoextent)_util_pst_pt_s0_gppd_pp_powerplants: 12_Downloads/gppd/global_power_plant_database.csv
+$(geoextent)_util_pst_pt_s0_gppd_pp_powerplants: data\in\mapaction\gppd\global_power_plant_database.csv
 	$(call generate_dataset_from_csv,233_util)
 
-12_Downloads/gppd/global_power_plant_database.csv: 11_Downloads_zip/global_power_plant_database_v_1_3.zip
+data\in\mapaction\gppd\global_power_plant_database.csv: data\in\mapaction\zipped\global_power_plant_database_v_1_3.zip
 	unzip "$<" "$(@D)"
+
+data\in\mapaction\zipped\global_power_plant_database_v_1_3.zip:
+	curl "https://wri-dataportal-prod.s3.amazonaws.com/manual/global_power_plant_database_v_1_3.zip" --remote-time -o "$@"
