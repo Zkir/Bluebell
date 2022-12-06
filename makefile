@@ -71,6 +71,7 @@ endef
 #=================================================================================================
 $(geoextent)_cmf: $(geoextent)_osm_datasets $(geoextent)_non_osm_datasets
 	status.py target "$@" "started" "$<"
+	zOsm2GeoJSON\completness_test.py "$(geoextent)" "data\out\mapaction\datasets\$(geoextent)"
 	if not exist "data\out\mapaction\cmf_zipped" md data\out\mapaction\cmf_zipped
 	tools\zip_cmf_json.bat data\out\mapaction\datasets\$(geoextent) data\out\mapaction\cmf_zipped\$@_json.zip	
 	tools\zip_cmf_shp.bat  data\out\mapaction\datasets\$(geoextent) data\out\mapaction\cmf_zipped\$@_shp.zip
@@ -80,6 +81,7 @@ $(geoextent)_cmf: $(geoextent)_osm_datasets $(geoextent)_non_osm_datasets
 	tools\update_ckan.bat data\out\mapaction\cmf_zipped\$@.CKAN.json
 	touch data\vtargets\$(@F)
 	status.py target "$@" "completed" 
+
 
 #=================================================================================================
 # Symbolic target for OSM based datasets

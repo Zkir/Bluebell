@@ -1,4 +1,5 @@
 import os
+import sys
 from ma_dictionaries import Geoextent
 #====================================================================================
 # home-brew relational DB interface
@@ -151,11 +152,13 @@ def print_html(strOutputFile,geoextent,dat,files):
 
 
 def main():
-    geoextent = "tza"
+    geoextent = sys.argv[1] #"tza"
+    dataset_folder = sys.argv[2]  #'c:/bluebell/90_Output/tza' #'c:/bluebell/96-Sample'
+
     strOutputFile = "c:/bluebell/99_WebUI/"+geoextent + "completeness.html"
-    #files = get_datasets_filenames(geoextent,'c:/bluebell/91_Output_zipped')
-    files = get_datasets_filenames2(geoextent, 'c:/bluebell/90_Output/tza')
-    #files = get_datasets_filenames2(geoextent, 'c:/bluebell/96-Sample')
+
+    files = get_datasets_filenames2(geoextent, dataset_folder)
+
 
 
     dat = loadDatFile("c:/bluebell/completeness_test.csv", separator=',', skipheaders=True)
