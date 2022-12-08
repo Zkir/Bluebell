@@ -33,15 +33,6 @@ FLD_THEME = 4
 FLD_TYPE = 5
 
 
-def get_datasets_filenames(geoextent, files_folder):
-    filtered_files = []
-    files = os.listdir(files_folder)
-    for file in files:
-        if (file[0:3] == geoextent) and (file.split('.')[-1] == 'zip'):
-            filtered_files.append(file)
-
-    return filtered_files
-
 def get_datasets_filenames2(geoextent, files_folder):
     datasets = []
     for (root, dirs, files) in os.walk(files_folder, topdown=True):
@@ -83,6 +74,10 @@ def match_datsets(record, files,geoextent_all):
             #print (dataset_name)
             if matched_datasets.count(dataset_name) == 0:
                 matched_datasets.append(dataset_name)
+
+    for f in matched_datasets:
+        files.remove(f)
+
     return matched_datasets
 
 def print_html(strOutputFile,geoextent,dat,files):
@@ -144,6 +139,21 @@ def print_html(strOutputFile,geoextent,dat,files):
         fo.write('        <td>' + '' + '</td>\n')
         fo.write('      </tr>\n')
 
+    #other useful datsets, the remainder
+    fo.write('      <tr>\n')
+    # fo.write('        <td>' + record[0] + '</td>\n')
+    fo.write('        <td> other useful datasets </td>\n')
+    fo.write('        <td> * </td>\n')
+    fo.write('        <td> * </td>\n')
+    fo.write('        <td> * </td>\n')
+    fo.write('        <td> * </td>\n')
+    fo.write('        <td>')
+    for xx in files:
+        fo.write(str(xx) + '<br />')
+    fo.write('</td>\n')
+    fo.write('        <td>' + '' + '</td>\n')
+    fo.write('      </tr>\n')
+
     fo.write('</table>\n')
     fo.write('</body>\n')
     fo.write('</html>\n')
@@ -153,13 +163,11 @@ def print_html(strOutputFile,geoextent,dat,files):
 
 def main():
     geoextent = sys.argv[1] #"tza"
-    dataset_folder = sys.argv[2]  #'c:/bluebell/90_Output/tza' #'c:/bluebell/96-Sample'
+    dataset_folder = sys.argv[2]  #'c:\Bluebell\data\out\mapaction\datasets\tza\' #'c:/bluebell/96-Sample'
 
     strOutputFile = "c:/bluebell/99_WebUI/"+geoextent + "completeness.html"
 
     files = get_datasets_filenames2(geoextent, dataset_folder)
-
-
 
     dat = loadDatFile("c:/bluebell/completeness_test.csv", separator=',', skipheaders=True)
     print_html(strOutputFile,geoextent,dat,files)
