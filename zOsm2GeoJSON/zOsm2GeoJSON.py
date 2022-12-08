@@ -227,7 +227,7 @@ def writeTagStatistics(strOutputFileName, Objects, min_tag_frequency, mandatory_
     return tags_stat_filtered
 
     
-def createJson(strInputOsmFile, strOutputFileName,strAction,strFilter):
+def createJson(strInputOsmFile, strOutputFileName,strAction,strFilter, min_tag_frequency, mandatory_tags, restricted_tags):
     print("input file: "+ strInputOsmFile)
     print("target file: "+ strOutputFileName)
     print ("action: " + strAction)
@@ -238,10 +238,6 @@ def createJson(strInputOsmFile, strOutputFileName,strAction,strFilter):
 
     objOsmGeom, Objects = readOsmXml(strInputOsmFile)
     SelectedObjects, last_known_edit = filterObjects(Objects, object_filter, strAction)
-
-    min_tag_frequency = 0.1
-    mandatory_tags = []
-    restricted_tags = ['addr:city', 'addr:municipality', 'addr:district', 'addr:ward', 'addr:street','addr:housenumber', 'source', 'source:date', 'fixme' ] #addr:*
 
     allowed_tags = writeTagStatistics(strOutputFileName+'.stat.txt',SelectedObjects, min_tag_frequency,mandatory_tags, restricted_tags  )
 
@@ -265,7 +261,7 @@ def main():
     parser.add_argument('--keep-nodes',type=str, help='object filter, affects nodes only, follows osmfilter format')
     parser.add_argument('--keep-ways',type=str, help='object filter, affects ways only, follows osmfilter format')
     parser.add_argument('--keep-relations',type=str, help='object filter, affects relations only, follows osmfilter format')
-    parser.add_argument('--min-tag-freq', type=float, default=0.00, help='minimal frequency for tags to be retained')
+    parser.add_argument('--min-tag-freq', type=float, default=0.10, help='minimal frequency for tags to be retained')
     parser.add_argument('--required-tags',type=str,
                         help='space separated list of tags that will be kept, even if their frequency is lower than specified one')
     parser.add_argument('--prohibited-tags',type=str,
@@ -288,7 +284,17 @@ def main():
         strFilter += '--keep-relations='+args.keep_relations + ' '
     strFilter = ' ' + strFilter.strip()
 
-    createJson(strInputFileName, strOutputFileName, strAction, strFilter)
+    min_tag_frequency = args.min_tag_freq
+
+    required_tags = []
+    if args.required_tags is not None:
+        for item in args.required_tags.split(' '):
+            required_tags.append(item.strip())
+
+    prohibited_tags = ['addr:city', 'addr:municipality', 'addr:district', 'addr:ward', 'addr:subward', 'addr:street',
+                       'addr:housenumber', 'source', 'source:date', 'fixme']  # 'addr:*','source:*'
+
+    createJson(strInputFileName, strOutputFileName, strAction, strFilter, min_tag_frequency, required_tags, prohibited_tags)
     print('Thats all, folks!')
 
 
