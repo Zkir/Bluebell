@@ -2,6 +2,7 @@
 import sys
 from datetime import datetime
 import os
+import argparse
 
 from mdlOsmParser    import readOsmXml
 from mdlFilterParser import parse_filter
@@ -170,9 +171,9 @@ def filterObjects(Objects, object_filter, strAction):
  
     return SelectedObjects, last_known_edit
 
-def writeTagStatistics(strOutputFileName, Objects):
+def writeTagStatistics(strOutputFileName, Objects, min_tag_frequency, mandatory_tags, restricted_tags):
     tags_stat = {}
-    tags_stat_filtered = {}
+    tags_stat_filtered = []
     for osmObject in Objects:
        for tag in osmObject.osmtags:
            if tag in tags_stat:
@@ -185,33 +186,40 @@ def writeTagStatistics(strOutputFileName, Objects):
         #сортировка
         tag_stat_sorted_as_list = sorted(tags_stat.items(), key=lambda item: item[1],reverse = True) #Сортировка словаря Python по значению
         
-        tags_stat_sorted=dict(tag_stat_sorted_as_list)
+        tags_stat_sorted = dict(tag_stat_sorted_as_list)
         
         max_tag = list(tags_stat_sorted.keys())[0]
         max_count=tags_stat_sorted[max_tag] 
         
         #Фильтрация 1% персентиль 
         for tag in tags_stat_sorted.keys():
-            if tags_stat[tag]/max_count >0.01:
-                tags_stat_filtered[tag] = tags_stat_sorted[tag]
+            if (tags_stat[tag]/max_count >= min_tag_frequency or tag in mandatory_tags) and tag not in restricted_tags:
+                tags_stat_filtered.append(tag)
         
         #вывод 
         fo = open(strOutputFileName, 'w', encoding="utf-8")
         fo.write(str(len(tags_stat_sorted)) + " different tags totally \n" ) 
         
-        print   ("1% tag filtering applied. " + str(len(tags_stat_filtered)) + " different tags retained out of " + str(len(tags_stat_sorted)))
-        fo.write("1% tag filtering applied. " + str(len(tags_stat_filtered)) + " different tags retained out of " + str(len(tags_stat_sorted)) +'\n\n')
-       
-        i=0
-        blnSeparatorPrinted = False 
+        print   (str(min_tag_frequency*100)+"% tag filtering applied. " + str(len(tags_stat_filtered)) + " different tags retained out of " + str(len(tags_stat_sorted)))
+        fo.write(str(min_tag_frequency*100)+"% tag filtering applied. " + str(len(tags_stat_filtered)) + " different tags retained out of " + str(len(tags_stat_sorted)) +'\n')
+        fo.write("mandatory tags: " + str(mandatory_tags)+"\n")
+        fo.write("restricted tags:" + str(restricted_tags)+"\n\n")
+
+        i = 0
+        fo.write('  NN  Tag                       Count           Percentage \n')
         for tag in tags_stat_sorted.keys():
-            i = i + 1
-            if (tags_stat[tag]/max_count < 0.01) and (not blnSeparatorPrinted) :
-                fo.write ('-------------------------------------------------------------- \n')
-                blnSeparatorPrinted = True 
-                
-            fo.write('{:4d}.'.format(i)+' '+'{:25s}'.format(tag) + ': ' + '{:10s}'.format(str(tags_stat_sorted[tag])) +'      (' +  "{:.1f}".format(tags_stat_sorted[tag]/max_count*100)   + ' %)\n' )
-                       
+            if tag in tags_stat_filtered:
+                i = i + 1
+                fo.write('{:4d}.'.format(i) + ' ' + '{:25s}'.format(tag) + ': ' + '{:10s}'.format(
+                    str(tags_stat_sorted[tag])) + '      (' + "{:.1f}".format(
+                    tags_stat_sorted[tag] / max_count * 100) + ' %)\n')
+        fo.write('-------------------------------------------------------------- \n')
+        for tag in tags_stat_sorted.keys():
+            if tag not in tags_stat_filtered:
+                i = i + 1
+                fo.write('{:4d}.'.format(i) + ' ' + '{:25s}'.format(tag) + ': ' + '{:10s}'.format(
+                    str(tags_stat_sorted[tag])) + '      (' + "{:.1f}".format(
+                    tags_stat_sorted[tag] / max_count * 100) + ' %)\n')
 
         fo.close()
     else: 
@@ -231,7 +239,11 @@ def createJson(strInputOsmFile, strOutputFileName,strAction,strFilter):
     objOsmGeom, Objects = readOsmXml(strInputOsmFile)
     SelectedObjects, last_known_edit = filterObjects(Objects, object_filter, strAction)
 
-    allowed_tags = writeTagStatistics(strOutputFileName+'.stat.txt',SelectedObjects)
+    min_tag_frequency = 0.1
+    mandatory_tags = []
+    restricted_tags = ['addr:city', 'addr:municipality', 'addr:district', 'addr:ward', 'addr:street','addr:housenumber', 'source', 'source:date', 'fixme' ] #addr:*
+
+    allowed_tags = writeTagStatistics(strOutputFileName+'.stat.txt',SelectedObjects, min_tag_frequency,mandatory_tags, restricted_tags  )
 
     writeGeoJson(SelectedObjects, objOsmGeom, strOutputFileName, strAction, allowed_tags, strFilter,last_known_edit)
     writeCKANJson(strOutputFileName, len(SelectedObjects), strFilter, last_known_edit)
@@ -240,28 +252,44 @@ def createJson(strInputOsmFile, strOutputFileName,strAction,strFilter):
     print("File " + strInputOsmFile + " processed in "+str(t2-t1)+" seconds")
 
 def main():
-    
-    if len(sys.argv)>1:
-        strInputFileName = sys.argv[1]
-        strOutputFileName = sys.argv[2]
-        strAction = sys.argv[3]
-        if strAction == "--action=write_lines":
-            strAction="write_lines"
-        elif strAction == "--action=write_poly":
-            strAction="write_poly"
-        elif strAction == "--action=write_poi":
-            strAction="write_poi"
-        else:
-            raise Exception('Unknown action type: '+strAction+'  Availble actions are "write_poi", "write_lines", "write_poly"')
+    parser = argparse.ArgumentParser(
+        prog='zOsm2GeoJSON',
+        description='This progam creates geojson from osm file ',
+        epilog='Created by zkir for MapAction/Kontur project. (c) zkir CC-0')
 
-        strFilter=""
-        for i in range(4, len(sys.argv)) :       
-            strFilter = strFilter + ' ' + sys.argv[i]
-            
-        createJson(strInputFileName, strOutputFileName, strAction, strFilter)
-        print('Thats all, folks!')
-    else:
-        print ('usage: zOsm2JSON input.osm [output.json]')
+    parser.add_argument('input_file', help='input file, should be osm.xml')
+    parser.add_argument('output_file', help='output json file')
+    parser.add_argument('--action', required=True, choices=['write_poi', 'write_lines', 'write_poly'],
+                        help='what type of objects to creates, points, lines or (multy)poligons')
+    parser.add_argument('--keep',type=str, help='object filter, follows osmfilter format')
+    parser.add_argument('--keep-nodes',type=str, help='object filter, affects nodes only, follows osmfilter format')
+    parser.add_argument('--keep-ways',type=str, help='object filter, affects ways only, follows osmfilter format')
+    parser.add_argument('--keep-relations',type=str, help='object filter, affects relations only, follows osmfilter format')
+    parser.add_argument('--min-tag-freq', type=float, default=0.00, help='minimal frequency for tags to be retained')
+    parser.add_argument('--required-tags',type=str,
+                        help='space separated list of tags that will be kept, even if their frequency is lower than specified one')
+    parser.add_argument('--prohibited-tags',type=str,
+                        help='space separated list of tags that will be dropped, even if their frequency is higher than specified one')
+
+    args = parser.parse_args()
+    #args.min_tag_freq
+
+    strInputFileName = args.input_file
+    strOutputFileName = args.output_file
+    strAction = args.action
+    strFilter= ""
+    if args.keep is not None:
+        strFilter += '--keep='+args.keep + ' '
+    if args.keep_nodes is not None:
+        strFilter += '--keep-nodes='+args.keep_nodes + ' '
+    if args.keep_ways is not None:
+        strFilter += '--keep-ways='+args.keep_ways + ' '
+    if args.keep_relations is not None:
+        strFilter += '--keep-relations='+args.keep_relations + ' '
+    strFilter = ' ' + strFilter.strip()
+
+    createJson(strInputFileName, strOutputFileName, strAction, strFilter)
+    print('Thats all, folks!')
 
 
 main()
