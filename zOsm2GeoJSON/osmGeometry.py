@@ -57,17 +57,6 @@ class clsOsmGeometry():
         self.nodehash[id]=self.max_node
 
     def FindNode(self, id):
-        #i = 0
-        #blnFound = False
-        #for i in range(0, self.max_node+1):
-        #    if self.nodes[i].id == id:
-        #        fn_return_value = i
-        #        blnFound = True
-        #        break
-        #if not blnFound:
-        #    #print("node id " + id + "not found!") 
-        #    fn_return_value = - 1
-        #return fn_return_value
         return self.nodehash.get(id,-1)
 
     def GetNodeID(self, intNodeNo):
@@ -138,16 +127,6 @@ class clsOsmGeometry():
         return fn_return_value
 
     def FindWay(self, id):
-        #i = 0
-        #blnFound = False
-        #for i in range(self.max_way+1):
-        #    if self.ways[i].id == id:
-        #        fn_return_value = i
-        #        blnFound = True
-        #        break
-        #if not blnFound:
-        #    fn_return_value = - 1
-        #return fn_return_value
         return self.wayhash.get(id,-1)
 
     def GetWayID(self, intWayNo):
