@@ -14,8 +14,8 @@ STATUS_TARGET_LOG_FOLDER = 6
 
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
-dat_file_name = "C:/Bluebell/99_WebUI/status.dat"
-dashboard_file_name = "C:/Bluebell/99_WebUI/index.html"
+dat_file_name = "99_WebUI/status.dat"
+dashboard_file_name = "99_WebUI/index.html"
 
 
 #====================================================================================

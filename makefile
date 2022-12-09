@@ -19,10 +19,13 @@ geoextent = tza
 # Generate dataset (json+shp) from OSM file
 define generate_dataset_from_osm
 	status.py target "$@" "started" "$<"
-	tools\osmfilter.exe data\in\mapaction\per_country_pbf\$(geoextent).o5m $(2) -o=data\mid\interim_osm\$@.osm
 	if not exist "data\out\mapaction\datasets\$(geoextent)\$(1)" md data\out\mapaction\datasets\$(geoextent)\$(1)
+	if not exist "data\mid\interim_osm" md "data\mid\interim_osm"
+	if not exist "data\out\mapaction\zipped" md "data\out\mapaction\zipped"
+        if not exist "data\vtargets" md "data\vtargets"
+	tools\osmfilter.exe data\in\mapaction\per_country_pbf\$(geoextent).o5m $(2) -o=data\mid\interim_osm\$@.osm
 	zOsm2GeoJSON\zOsm2GeoJSON.py data\mid\interim_osm\$@.osm data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json --action=$(3) $(2)
-	c:\OSGeo4W\bin\ogr2ogr.exe  -lco ENCODING=UTF8 -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json
+	ogr2ogr.exe  -lco ENCODING=UTF8 -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json
         tools\zip_json.bat data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\zipped\$@.json.zip
         tools\zip_shp.bat  data\out\mapaction\datasets\$(geoextent)\$(1)\$@      data\out\mapaction\zipped\$@.shp.zip
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data\out\mapaction\zipped\$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
@@ -37,8 +40,8 @@ endef
 define generate_dataset_from_shp
 	status.py target "$@" "started" "$<"
 	if not exist "data\out\mapaction\datasets\$(geoextent)\$(1)" md data\out\mapaction\datasets\$(geoextent)\$(1)
-	c:\OSGeo4W\bin\ogr2ogr.exe -clipsrc static_data\mapaction_poly_files\$(geoextent).shp -lco ENCODING=UTF8 -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp $<\$(<F).shp
-	c:\OSGeo4W\bin\ogr2ogr.exe -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp
+	ogr2ogr.exe -clipsrc static_data\mapaction_poly_files\$(geoextent).shp -lco ENCODING=UTF8 -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp $<\$(<F).shp
+	ogr2ogr.exe -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp
 	tools\zip_json.bat data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\zipped\$@.json.zip
 	tools\zip_shp.bat  data\out\mapaction\datasets\$(geoextent)\$(1)\$@      data\out\mapaction\zipped\$@.shp.zip
 	zOsm2GeoJSON\writeCKANjson.py "data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json"
@@ -53,8 +56,8 @@ endef
 define generate_dataset_from_csv
 	status.py target "$@" "started" "$<"
 	if not exist "data\out\mapaction\datasets\$(geoextent)\$(1)" md data\out\mapaction\datasets\$(geoextent)\$(1)
-	c:\OSGeo4W\bin\ogr2ogr.exe -s_srs EPSG:4326 -t_srs EPSG:3857 -oo X_POSSIBLE_NAMES=lon* -oo Y_POSSIBLE_NAMES=lat* -lco ENCODING=UTF8 -clipsrc static_data\mapaction_poly_files\$(geoextent).shp  -f "ESRI Shapefile" data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp $<
-	c:\OSGeo4W\bin\ogr2ogr.exe -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp
+	ogr2ogr.exe -s_srs EPSG:4326 -t_srs EPSG:3857 -oo X_POSSIBLE_NAMES=lon* -oo Y_POSSIBLE_NAMES=lat* -lco ENCODING=UTF8 -clipsrc static_data\mapaction_poly_files\$(geoextent).shp  -f "ESRI Shapefile" data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp $<
+	ogr2ogr.exe -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp
 	zOsm2GeoJSON\writeCKANjson.py "data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json"
 	tools\zip_json.bat data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\zipped\$@.json.zip
 	tools\zip_shp.bat  data\out\mapaction\datasets\$(geoextent)\$(1)\$@      data\out\mapaction\zipped\$@.shp.zip
@@ -328,27 +331,22 @@ $(geoextent)_admn_ad3_py_s4_osm_pp_adminboundary3: $(geoextent).o5m
 # Extraction of geoextent, update of planet
 #=================================================================================================
 
-$(geoextent)_1.o5m: 
-	status.py target "$@" "started" "$<"
-	echo assume that $@ exist
-	status.py target "$@" "completed" 
 
-$(geoextent).o5m: planet-latest.osm.pbf
-	status.py target "$@" "started" "$<"
-	osmium extract -s smart -p static_data\mapaction_poly_files\$(geoextent).poly 10_Planet\planet-latest.osm.pbf -o data\in\mapaction\per_country_pbf\$(geoextent).pbf --overwrite
+$(geoextent).o5m: planet-latest.osm.pbf | data\in\mapaction\per_country_pbf
+	osmium extract -s smart -p static_data\mapaction_poly_files\$(geoextent).poly data\in\planet.osm\planet-latest.osm.pbf -o data\in\mapaction\per_country_pbf\$(geoextent).pbf --overwrite
 	osmconvert data\in\mapaction\per_country_pbf\$(geoextent).pbf -o=data\in\mapaction\per_country_pbf\$(geoextent).o5m
-	status.py target "$@" "completed" 
 
-$(geoextent)1.o5m:
-	
-ifneq ("$(wildcard data\in\mapaction\per_country_pbf\$(geoextent).o5m)","")
-	del data\in\mapaction\per_country_pbf\$(geoextent)_old.o5m
-	ren data\in\mapaction\per_country_pbf\$(geoextent).o5m $(geoextent)_old.o5m
-	osmupdate64 data\in\mapaction\per_country_pbf\$(geoextent)_old.o5m data\in\mapaction\per_country_pbf\$(geoextent).o5m -B=static_data\mapaction_poly_files\$(geoextent).poly -v
-else
-	osmconvert 10_Planet\planet-latest.osm.pbf --complete-ways --complete-multipolygons -B=static_data\mapaction_poly_files\$(geoextent).poly -o=data\in\mapaction\per_country_pbf\$(geoextent).o5m
-endif
-	echo $@  completed
+
+planet-latest.osm.pbf:
+	if exist "data\in\planet.osm" del /q "data\in\planet.osm" 
+	aria2c "https://planet.openstreetmap.org/pbf/planet-latest.osm.pbf.torrent" --seed-time=0 --dir="data\in\planet.osm"
+	ren "data\in\planet.osm\planet-*.osm.pbf" $@
+	del /q "data\in\planet.osm\planet-*.osm.pbf.torrent"
+	touch "data\in\planet.osm/$(@F)"
+
+data\in\mapaction\per_country_pbf:
+	md data\in\mapaction\per_country_pbf
+
 #=================================================================================================
 #=================================================================================================
 #                  Non-osm datasets, from global data
@@ -389,19 +387,19 @@ data\in\mapaction\natural_earth\ne_10m_roads: data\in\mapaction\zipped\ne_10m_ro
 data\in\mapaction\natural_earth\ne_10m_populated_places : data\in\mapaction\zipped\ne_10m_populated_places.zip
 	unzip "$<" "$@"
 
-data\in\mapaction\zipped\ne_10m_rivers_lake_centerlines.zip:
+data\in\mapaction\zipped\ne_10m_rivers_lake_centerlines.zip: |data\in\mapaction\zipped
 	curl "https://naciscdn.org/naturalearth/10m/physical/ne_10m_rivers_lake_centerlines.zip" -o "$@"
 
-data\in\mapaction\zipped\ne_10m_coastline.zip :
+data\in\mapaction\zipped\ne_10m_coastline.zip : |data\in\mapaction\zipped
 	curl "https://naciscdn.org/naturalearth/10m/physical/ne_10m_coastline.zip" -o "$@"
 
-data\in\mapaction\zipped\ne_10m_roads.zip:
+data\in\mapaction\zipped\ne_10m_roads.zip: |data\in\mapaction\zipped
 	curl "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_roads.zip" -o "$@"
 
-data\in\mapaction\zipped\ne_10m_populated_places.zip:
+data\in\mapaction\zipped\ne_10m_populated_places.zip: |data\in\mapaction\zipped
 	curl "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_populated_places.zip" -o "$@"
 
-data\in\mapaction\zipped\ne_10m_lakes.zip: 
+data\in\mapaction\zipped\ne_10m_lakes.zip: |data\in\mapaction\zipped
 	curl "https://naciscdn.org/naturalearth/10m/physical/ne_10m_lakes.zip" -o "$@"
 #=================================================================================================
 # Our Airports
@@ -435,7 +433,7 @@ $(geoextent)_tran_rrd_ln_s0_wfp_pp_railways: data\in\mapaction/WFP/wld_trs_railw
 data\in\mapaction/WFP/wld_trs_railways_wfp : data\in\mapaction\zipped\wld_trs_railways_wfp.zip
 	unzip "$<" "$@"
 
-data\in\mapaction\zipped\wld_trs_railways_wfp.zip:
+data\in\mapaction\zipped\wld_trs_railways_wfp.zip: |data\in\mapaction\zipped
 	curl "https://geonode.wfp.org/geoserver/wfs?format_options=charset%3AUTF-8&typename=geonode%3Awld_trs_railways_wfp&outputFormat=SHAPE-ZIP&version=1.0.0&service=WFS&request=GetFeature" -o "$@"
 
 #=================================================================================================
@@ -448,5 +446,8 @@ $(geoextent)_util_pst_pt_s0_gppd_pp_powerplants: data\in\mapaction\gppd\global_p
 data\in\mapaction\gppd\global_power_plant_database.csv: data\in\mapaction\zipped\global_power_plant_database_v_1_3.zip
 	unzip "$<" "$(@D)"
 
-data\in\mapaction\zipped\global_power_plant_database_v_1_3.zip:
+data\in\mapaction\zipped\global_power_plant_database_v_1_3.zip: |data\in\mapaction\zipped
 	curl "https://wri-dataportal-prod.s3.amazonaws.com/manual/global_power_plant_database_v_1_3.zip" --remote-time -o "$@"
+
+data\in\mapaction\zipped:
+	md $@

@@ -21,7 +21,7 @@ def writeGeoJson(Objects, objOsmGeom, strOutputFile, strAction, allowed_tags, st
     fo.write('{ \n') 
     fo.write('    "type": "FeatureCollection",\n')
     fo.write('    "generator" : "bluebell-zOsm2GeoJSON",\n')
-    fo.write('    "generation_date" : "' + escapeJsonString(datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))+'", \n')
+    #fo.write('    "generation_date" : "' + escapeJsonString(datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))+'", \n')
     fo.write('    "number_of_objects": "'+str(len(Objects))+'",\n')
     fo.write('    "last_known_edit_date": "' + escapeJsonString(last_known_edit) + '",\n')
     fo.write('    "dataset_title": "' + escapeJsonString(dataset_name) + '",\n')
@@ -233,19 +233,28 @@ def createJson(strInputOsmFile, strOutputFileName,strAction,strFilter, min_tag_f
     print ("action: " + strAction)
     print ("filter: " + strFilter)
 
-    t1 = time.time()
+    t0 = time.time()
     object_filter = parse_filter(strFilter)
+    t1 = time.time()
+    print("Filter parsed in "+str(t1-t0)+" seconds")
 
     objOsmGeom, Objects = readOsmXml(strInputOsmFile)
+    t2 = time.time()
+    print("osm read in "+str(t2-t1)+" seconds")
+
     SelectedObjects, last_known_edit = filterObjects(Objects, object_filter, strAction)
+    t3 = time.time()
+    print("Filter applied "+str(t3-t2)+" seconds")
 
     allowed_tags = writeTagStatistics(strOutputFileName+'.stat.txt',SelectedObjects, min_tag_frequency,mandatory_tags, restricted_tags  )
+    t4 = time.time()
+    print("Statistics calculated in "+str(t4-t3)+" seconds")
 
     writeGeoJson(SelectedObjects, objOsmGeom, strOutputFileName, strAction, allowed_tags, strFilter,last_known_edit)
     writeCKANJson(strOutputFileName, len(SelectedObjects), strFilter, last_known_edit)
-
-    t2 = time.time()
-    print("File " + strInputOsmFile + " processed in "+str(t2-t1)+" seconds")
+    t5 = time.time()
+    print("Json written in "+str(t5-t4)+" seconds")
+    print("File " + strInputOsmFile + " processed in "+str(t5-t0)+" seconds")
 
 def main():
     parser = argparse.ArgumentParser(
