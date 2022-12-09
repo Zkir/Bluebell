@@ -165,11 +165,11 @@ def main():
     geoextent = sys.argv[1] #"tza"
     dataset_folder = sys.argv[2]  #'c:\Bluebell\data\out\mapaction\datasets\tza\' #'c:/bluebell/96-Sample'
 
-    strOutputFile = "c:/bluebell/99_WebUI/"+geoextent + "completeness.html"
+    strOutputFile = "99_WebUI/"+geoextent + "completeness.html"
 
     files = get_datasets_filenames2(geoextent, dataset_folder)
 
-    dat = loadDatFile("c:/bluebell/completeness_test.csv", separator=',', skipheaders=True)
+    dat = loadDatFile("completeness_test.csv", separator=',', skipheaders=True)
     print_html(strOutputFile,geoextent,dat,files)
 
 

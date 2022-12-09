@@ -13,30 +13,7 @@ class T3DObject:
         self.NodeRefs = []
         self.way_count = 0
         self.WayRefs = []
-        self.name = ""
-        self.descr = ""
-        self.key_tags = ""
-        self.strWikipediaName = ""
-        self.tagBuilding = ""
-        self.tagArchitecture = ""
-        self.tagManMade = ""
-        self.tagBarrier = ""
-        self.tagTowerType = ""
-        self.tagAmenity = ""
-        self.tagDenomination = ""
-        self.tagStartDate = ""
-        self.tagRuins = ""
-        self.tagWikipedia = ""
-        self.tagAddrStreet = ""
-        self.tagAddrHouseNumber = ""
-        self.tagAddrCity = ""
-        self.tagAddrDistrict = ""
-        self.tagAddrRegion = ""
-        self.material = ""
-        self.dblHeight = 0
         self.osmtags = {}
-        self.size = 0
-        self.blnHasBuildingParts = False
 
         self.bbox.minLat = 0
         self.bbox.minLon = 0
@@ -133,59 +110,15 @@ def readOsmXml(strSrcOsmFile):
             osmObject.osmtags[StrKey] = strValue
 
 
-            if StrKey == 'name':
-                osmObject.name = strValue
-            if StrKey == 'description':
-                osmObject.descr = strValue
-            if StrKey == 'building':
-                osmObject.tagBuilding = strValue
-                osmObject.key_tags = osmObject.key_tags + ' building=' + osmObject.tagBuilding
-            if StrKey == 'building:architecture':
-                osmObject.tagArchitecture = strValue
-            if StrKey == 'start_date':
-                osmObject.tagStartDate = strValue
-            if StrKey == 'man_made':
-                osmObject.tagManMade = strValue
-                osmObject.key_tags = osmObject.key_tags + ' man_made=' + osmObject.tagManMade
-            if StrKey == 'barrier':
-                osmObject.tagBarrier = strValue
-                osmObject.key_tags = osmObject.key_tags + ' barrier=' + osmObject.tagBarrier
-            # wikipedia
-            if StrKey == 'wikipedia':
-                osmObject.tagWikipedia = strValue
-            if StrKey == 'addr:street':
-                osmObject.tagAddrStreet = strValue
-            if StrKey == 'addr:housenumber':
-                osmObject.tagAddrHouseNumber = strValue
-            if StrKey == 'addr:city':
-                osmObject.tagAddrCity = strValue
-            if StrKey == 'addr:district':
-                osmObject.tagAddrDistrict = strValue
-            if StrKey == 'addr:region':
-                osmObject.tagAddrRegion = strValue
-            #ref_temples_ru
-            if StrKey == 'ref:temples.ru':
-                ref_temples_ru = strValue
-                #print ref_temples_ru
-            if StrKey == 'amenity':
-                osmObject.tagAmenity = strValue
-            if StrKey == 'denomination':
-                osmObject.tagDenomination = strValue
-            if StrKey == 'tower:type':
-                osmObject.tagTowerType = strValue
-            if StrKey == 'building:material':
-                osmObject.material = strValue
-            if StrKey == 'ruins':
-                osmObject.tagRuins = strValue
-
-
         if strTag == '/way':
             intWayNo = objOsmGeom.AddWay(osmObject.id, osmObject.NodeRefs, osmObject.node_count)
             osmObject.bbox = objOsmGeom.GetWayBBox(intWayNo)
-            osmObject.size = objOsmGeom.CalculateWaySize(intWayNo)
+
+            #osmObject.size = objOsmGeom.CalculateWaySize(intWayNo)
 
         if strTag == '/relation':
-            osmObject.size = objOsmGeom.CalculateRelationSize(osmObject.WayRefs, osmObject.way_count)
+            pass
+            # osmObject.size = objOsmGeom.CalculateRelationSize(osmObject.WayRefs, osmObject.way_count)
             # bbox is already calculated above
 
         # Closing node

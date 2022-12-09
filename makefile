@@ -143,12 +143,14 @@ $(geoextent)_non_osm_datasets:  $(geoextent)_tran_rds_ln_s0_naturalearth_pp_road
                                 $(geoextent)_phys_lak_py_s0_naturalearth_pp_waterbodies \
                                 $(geoextent)_elev_cst_ln_s0_naturalearth_pp_coastline \
                                 $(geoextent)_tran_air_pt_s0_ourairports_pp_airports \
-                                $(geoextent)_tran_por_pt_s0_worldports_pp_ports \
-                                $(geoextent)_util_pst_pt_s0_gppd_pp_powerplants
+                                $(geoextent)_tran_rrd_ln_s0_wfp_pp_railways \
+                                $(geoextent)_util_pst_pt_s0_gppd_pp_powerplants \
+                                $(geoextent)_tran_por_pt_s0_worldports_pp_ports
+
 
 	echo Non-osm layers completed OK
 	touch data\vtargets\$(@F)
-# $(geoextent)_tran_rrd_ln_s0_wfp_pp_railways\
+
 
 #=================================================================================================
 # OSM based datasets
@@ -445,9 +447,11 @@ $(geoextent)_util_pst_pt_s0_gppd_pp_powerplants: data\in\mapaction\gppd\global_p
 
 data\in\mapaction\gppd\global_power_plant_database.csv: data\in\mapaction\zipped\global_power_plant_database_v_1_3.zip
 	unzip "$<" "$(@D)"
+	touch "$@"
 
 data\in\mapaction\zipped\global_power_plant_database_v_1_3.zip: |data\in\mapaction\zipped
 	curl "https://wri-dataportal-prod.s3.amazonaws.com/manual/global_power_plant_database_v_1_3.zip" --remote-time -o "$@"
+	touch "$@"   
 
 data\in\mapaction\zipped:
 	md $@
