@@ -259,7 +259,7 @@ def createJson(strInputOsmFile, strOutputFileName,strAction,strFilter, min_tag_f
 def main():
     parser = argparse.ArgumentParser(
         prog='zOsm2GeoJSON',
-        description='This progam creates geojson from osm file ',
+        description='This program creates geojson from osm file ',
         epilog='Created by zkir for MapAction/Kontur project. (c) zkir CC-0')
 
     parser.add_argument('input_file', help='input file, should be osm.xml')

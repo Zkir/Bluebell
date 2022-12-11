@@ -1,0 +1,54 @@
+#=================================================================================================
+# Definitions of operations
+#=================================================================================================
+# Generate dataset (json+shp) from OSM file
+define generate_dataset_from_osm
+	status.py target "$@" "started" "$<"
+	if not exist "data\out\mapaction\datasets\$(geoextent)\$(1)" md data\out\mapaction\datasets\$(geoextent)\$(1)
+	if not exist "data\mid\interim_osm" md "data\mid\interim_osm"
+	if not exist "data\out\mapaction\zipped" md "data\out\mapaction\zipped"
+        if not exist "data\vtargets" md "data\vtargets"
+	tools\osmfilter.exe data\in\mapaction\per_country_pbf\$(geoextent).o5m $(2) -o=data\mid\interim_osm\$@.osm
+	zOsm2GeoJSON\zOsm2GeoJSON.py data\mid\interim_osm\$@.osm data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json --action=$(3) $(2)
+	ogr2ogr.exe  -lco ENCODING=UTF8 -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json
+        tools\zip_json.bat data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\zipped\$@.json.zip
+        tools\zip_shp.bat  data\out\mapaction\datasets\$(geoextent)\$(1)\$@      data\out\mapaction\zipped\$@.shp.zip
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data\out\mapaction\zipped\$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data\out\mapaction\zipped\$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
+	tools\update_ckan.bat data\out\mapaction\datasets\$(geoextent)\$(1)\$@.CKAN.json
+	status.py target "$@" "completed"
+        touch data\vtargets\$(@F)   
+	echo $@ completed
+endef
+
+# Generate dataset (json+shp) from SHP file, + clipping
+define generate_dataset_from_shp
+	status.py target "$@" "started" "$<"
+	if not exist "data\out\mapaction\datasets\$(geoextent)\$(1)" md data\out\mapaction\datasets\$(geoextent)\$(1)
+	ogr2ogr.exe -clipsrc static_data\mapaction_poly_files\$(geoextent).json -lco ENCODING=UTF8 -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp $<\$(<F).shp
+	ogr2ogr.exe -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp
+	tools\zip_json.bat data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\zipped\$@.json.zip
+	tools\zip_shp.bat  data\out\mapaction\datasets\$(geoextent)\$(1)\$@      data\out\mapaction\zipped\$@.shp.zip
+	zOsm2GeoJSON\writeCKANjson.py "data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json"
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data\out\mapaction\zipped\$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data\out\mapaction\zipped\$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
+	tools\update_ckan.bat data\out\mapaction\datasets\$(geoextent)\$(1)\$@.CKAN.json
+	status.py target "$@" "completed" 
+        touch data\vtargets\$(@F)
+endef
+
+# Generate dataset (json+shp) from CSV file, + clipping
+define generate_dataset_from_csv
+	status.py target "$@" "started" "$<"
+	if not exist "data\out\mapaction\datasets\$(geoextent)\$(1)" md data\out\mapaction\datasets\$(geoextent)\$(1)
+	ogr2ogr.exe -s_srs EPSG:4326 -t_srs EPSG:3857 -oo X_POSSIBLE_NAMES=lon* -oo Y_POSSIBLE_NAMES=lat* -lco ENCODING=UTF8 -clipsrc static_data\mapaction_poly_files\$(geoextent).json  -f "ESRI Shapefile" data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp $<
+	ogr2ogr.exe -skipfailures data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\datasets\$(geoextent)\$(1)\$@.shp
+	zOsm2GeoJSON\writeCKANjson.py "data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json"
+	tools\zip_json.bat data\out\mapaction\datasets\$(geoextent)\$(1)\$@.json data\out\mapaction\zipped\$@.json.zip
+	tools\zip_shp.bat  data\out\mapaction\datasets\$(geoextent)\$(1)\$@      data\out\mapaction\zipped\$@.shp.zip
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data\out\mapaction\zipped\$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
+	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data\out\mapaction\zipped\$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
+	tools\update_ckan.bat data\out\mapaction\datasets\$(geoextent)\$(1)\$@.CKAN.json
+	status.py target "$@" "completed" 
+        touch data\vtargets\$(@F)
+endef
