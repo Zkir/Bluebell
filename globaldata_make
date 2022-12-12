@@ -9,14 +9,14 @@
 #-------------------------------------------------------------------------------------------------
 
 planet-latest.osm.pbf:
-	if [exist "data/in/planet.osm"]; then rm -f "data/in/planet.osm"; fi
+	if [exist data/in/planet.osm]; then rm -f data/in/planet.osm; fi
 	aria2c "https://planet.openstreetmap.org/pbf/planet-latest.osm.pbf.torrent" --seed-time=0 --dir="data/in/planet.osm"
-	mv "data/in/planet.osm/planet-*.osm.pbf" $@
-	rm -f "data/in/planet.osm/planet-*.osm.pbf.torrent"
-	touch "data/in/planet.osm/$(@F)"
+	mv data/in/planet.osm/planet-*.osm.pbf data/in/planet.osm/$(F@)
+	rm -f data/in/planet.osm/planet-*.osm.pbf.torrent
+	touch data/in/planet.osm/$(@F)
 
 data/in/mapaction/per_country_pbf:
-	md data/in/mapaction/per_country_pbf
+	mkdir data/in/mapaction/per_country_pbf
 
 #-------------------------------------------------------------------------------------------------
 # Natural Earth
@@ -55,7 +55,7 @@ data/in/mapaction/zipped/ne_10m_lakes.zip: |data/in/mapaction/zipped
 # Our Airports
 #-------------------------------------------------------------------------------------------------
 data/in/mapaction/ourairports/airports.csv:
-	if not exist "data/in/mapaction/ourairports" then md "data/in/mapaction/ourairports/" fi
+	if not exist "data/in/mapaction/ourairports" then mkdir "data/in/mapaction/ourairports/" fi
 	curl "https://davidmegginson.github.io/ourairports-data/airports.csv" -o "$@"
 
 
@@ -64,7 +64,7 @@ data/in/mapaction/ourairports/airports.csv:
 #-------------------------------------------------------------------------------------------------
 
 data/in/mapaction/worldports/UpdatedPub150.csv: 
-	if not exist "data/in/mapaction/worldports" then md "data/in/mapaction/worldports/" fi
+	if not exist "data/in/mapaction/worldports" then mkdir "data/in/mapaction/worldports/" fi
 	curl "https://msi.nga.mil/api/publications/download?type=view&key=16920959/SFH00000/UpdatedPub150.csv" -o "$@"
 
 #-------------------------------------------------------------------------------------------------
@@ -90,4 +90,4 @@ data/in/mapaction/zipped/global_power_plant_database_v_1_3.zip: |data/in/mapacti
 	touch "$@"   
 
 data/in/mapaction/zipped:
-	md $@
+	mkdir $@
