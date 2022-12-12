@@ -9,53 +9,53 @@
 #-------------------------------------------------------------------------------------------------
 
 planet-latest.osm.pbf:
-	if exist "data\in\planet.osm" del /q "data\in\planet.osm" 
-	aria2c "https://planet.openstreetmap.org/pbf/planet-latest.osm.pbf.torrent" --seed-time=0 --dir="data\in\planet.osm"
-	ren "data\in\planet.osm\planet-*.osm.pbf" $@
-	del /q "data\in\planet.osm\planet-*.osm.pbf.torrent"
-	touch "data\in\planet.osm/$(@F)"
+	if [exist "data/in/planet.osm"]; then rm -f "data/in/planet.osm"; fi
+	aria2c "https://planet.openstreetmap.org/pbf/planet-latest.osm.pbf.torrent" --seed-time=0 --dir="data/in/planet.osm"
+	mv "data/in/planet.osm/planet-*.osm.pbf" $@
+	rm -f "data/in/planet.osm/planet-*.osm.pbf.torrent"
+	touch "data/in/planet.osm/$(@F)"
 
-data\in\mapaction\per_country_pbf:
-	md data\in\mapaction\per_country_pbf
+data/in/mapaction/per_country_pbf:
+	md data/in/mapaction/per_country_pbf
 
 #-------------------------------------------------------------------------------------------------
 # Natural Earth
 #-------------------------------------------------------------------------------------------------
-data\in\mapaction\natural_earth\ne_10m_lakes:  data\in\mapaction\zipped\ne_10m_lakes.zip
+data/in/mapaction/natural_earth/ne_10m_lakes:  data/in/mapaction/zipped/ne_10m_lakes.zip
 	unzip "$<" "$@"
 
-data\in\mapaction\natural_earth\ne_10m_rivers_lake_centerlines : data\in\mapaction\zipped\ne_10m_rivers_lake_centerlines.zip
+data/in/mapaction/natural_earth/ne_10m_rivers_lake_centerlines : data/in/mapaction/zipped/ne_10m_rivers_lake_centerlines.zip
 	unzip "$<" "$@"
 
-data\in\mapaction\natural_earth\ne_10m_coastline : data\in\mapaction\zipped\ne_10m_coastline.zip 
+data/in/mapaction/natural_earth/ne_10m_coastline : data/in/mapaction/zipped/ne_10m_coastline.zip 
 	unzip "$<" "$@"
 
-data\in\mapaction\natural_earth\ne_10m_roads: data\in\mapaction\zipped\ne_10m_roads.zip
+data/in/mapaction/natural_earth/ne_10m_roads: data/in/mapaction/zipped/ne_10m_roads.zip
 	unzip "$<" "$@"
 
-data\in\mapaction\natural_earth\ne_10m_populated_places : data\in\mapaction\zipped\ne_10m_populated_places.zip
+data/in/mapaction/natural_earth/ne_10m_populated_places : data/in/mapaction/zipped/ne_10m_populated_places.zip
 	unzip "$<" "$@"
 
-data\in\mapaction\zipped\ne_10m_rivers_lake_centerlines.zip: |data\in\mapaction\zipped
+data/in/mapaction/zipped/ne_10m_rivers_lake_centerlines.zip: |data/in/mapaction/zipped
 	curl "https://naciscdn.org/naturalearth/10m/physical/ne_10m_rivers_lake_centerlines.zip" -o "$@"
 
-data\in\mapaction\zipped\ne_10m_coastline.zip : |data\in\mapaction\zipped
+data/in/mapaction/zipped/ne_10m_coastline.zip : |data/in/mapaction/zipped
 	curl "https://naciscdn.org/naturalearth/10m/physical/ne_10m_coastline.zip" -o "$@"
 
-data\in\mapaction\zipped\ne_10m_roads.zip: |data\in\mapaction\zipped
+data/in/mapaction/zipped/ne_10m_roads.zip: |data/in/mapaction/zipped
 	curl "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_roads.zip" -o "$@"
 
-data\in\mapaction\zipped\ne_10m_populated_places.zip: |data\in\mapaction\zipped
+data/in/mapaction/zipped/ne_10m_populated_places.zip: |data/in/mapaction/zipped
 	curl "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_populated_places.zip" -o "$@"
 
-data\in\mapaction\zipped\ne_10m_lakes.zip: |data\in\mapaction\zipped
+data/in/mapaction/zipped/ne_10m_lakes.zip: |data/in/mapaction/zipped
 	curl "https://naciscdn.org/naturalearth/10m/physical/ne_10m_lakes.zip" -o "$@"
 
 #-------------------------------------------------------------------------------------------------
 # Our Airports
 #-------------------------------------------------------------------------------------------------
-data\in\mapaction/ourairports/airports.csv:
-	if not exist "data\in\mapaction/ourairports" md "data\in\mapaction/ourairports/"
+data/in/mapaction/ourairports/airports.csv:
+	if not exist "data/in/mapaction/ourairports" then md "data/in/mapaction/ourairports/" fi
 	curl "https://davidmegginson.github.io/ourairports-data/airports.csv" -o "$@"
 
 
@@ -63,31 +63,31 @@ data\in\mapaction/ourairports/airports.csv:
 # World Ports
 #-------------------------------------------------------------------------------------------------
 
-data\in\mapaction/worldports/UpdatedPub150.csv: 
-	if not exist "data\in\mapaction/worldports" md "data\in\mapaction/worldports/"
+data/in/mapaction/worldports/UpdatedPub150.csv: 
+	if not exist "data/in/mapaction/worldports" then md "data/in/mapaction/worldports/" fi
 	curl "https://msi.nga.mil/api/publications/download?type=view&key=16920959/SFH00000/UpdatedPub150.csv" -o "$@"
 
 #-------------------------------------------------------------------------------------------------
 # WFP Railroads
 #-------------------------------------------------------------------------------------------------
 
-data\in\mapaction/WFP/wld_trs_railways_wfp : data\in\mapaction\zipped\wld_trs_railways_wfp.zip
+data/in/mapaction/WFP/wld_trs_railways_wfp : data/in/mapaction/zipped/wld_trs_railways_wfp.zip
 	unzip "$<" "$@"
 
-data\in\mapaction\zipped\wld_trs_railways_wfp.zip: |data\in\mapaction\zipped
+data/in/mapaction/zipped/wld_trs_railways_wfp.zip: |data/in/mapaction/zipped
 	curl "https://geonode.wfp.org/geoserver/wfs?format_options=charset%3AUTF-8&typename=geonode%3Awld_trs_railways_wfp&outputFormat=SHAPE-ZIP&version=1.0.0&service=WFS&request=GetFeature" -o "$@"
 
 #-------------------------------------------------------------------------------------------------
 # Global Power Plant Database
 #-------------------------------------------------------------------------------------------------
 
-data\in\mapaction\gppd\global_power_plant_database.csv: data\in\mapaction\zipped\global_power_plant_database_v_1_3.zip
+data/in/mapaction/gppd/global_power_plant_database.csv: data/in/mapaction/zipped/global_power_plant_database_v_1_3.zip
 	unzip "$<" "$(@D)"
 	touch "$@"
 
-data\in\mapaction\zipped\global_power_plant_database_v_1_3.zip: |data\in\mapaction\zipped
+data/in/mapaction/zipped/global_power_plant_database_v_1_3.zip: |data/in/mapaction/zipped
 	curl "https://wri-dataportal-prod.s3.amazonaws.com/manual/global_power_plant_database_v_1_3.zip" --remote-time -o "$@"
 	touch "$@"   
 
-data\in\mapaction\zipped:
+data/in/mapaction/zipped:
 	md $@

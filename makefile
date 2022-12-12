@@ -3,9 +3,9 @@
 #===================================================================
 
 # some tricks with folders 
-vpath %.pbf data\in\mapaction\per_country_pbf data\in\planet.osm
-vpath %.o5m data\in\mapaction\per_country_pbf data\in\planet.osm
-vpath % data\vtargets  
+vpath %.pbf data/in/mapaction/per_country_pbf data/in/planet.osm
+vpath %.o5m data/in/mapaction/per_country_pbf data/in/planet.osm
+vpath % data/vtargets  
 
 # let's read definitions of operations, 
 # how to produce datasets from different sources types, osm, csv, shp

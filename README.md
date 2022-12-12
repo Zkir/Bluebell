@@ -21,3 +21,12 @@ conda install -c conda-forge osmium-tool
 
 ogr2org
 conda install -c conda-forge gdal
+
+
+Dependancies linux
+
+make
+sudo apt install make
+
+aria2:
+sudo apt install -y aria2
