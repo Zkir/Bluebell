@@ -1,10 +1,15 @@
 # this make file contains dataset definitions for single country
+
+#Due to some strange feature of GNU MAKE we need to assign value to geoextent twice: as global variable and as target specific variable
 geoextent = tza
+$(geoextent)_cmf: geoextent= tza
 
 #=================================================================================================
 # Crash move folder -- the main target
 #=================================================================================================
-$(geoextent)_cmf: $(geoextent)_osm_datasets $(geoextent)_non_osm_datasets
+
+$(geoextent)_cmf: $(geoextent)_osm_datasets $(geoextent)_non_osm_datasets 
+	echo geoextent $(geoextent)   
 	$(call generate_cmf)
 
 

@@ -1,22 +1,15 @@
 # this make file contains dataset definitions for single country
 
+#Due to some strange feature of GNU MAKE we need to assign value to geoextent twice: as global variable and as target specific variable
 geoextent = blr
-
+$(geoextent)_cmf: geoextent=blr
 #=================================================================================================
 # Crash move folder -- the main target
 #=================================================================================================
-$(geoextent)_cmf: $(geoextent)_osm_datasets $(geoextent)_non_osm_datasets
-	status.py target "$@" "started" "$<"
-	zOsm2GeoJSON/completness_test.py "$(geoextent)" "data/out/mapaction/datasets/$(geoextent)"
-	if not exist "data/out/mapaction/cmf_zipped" md data/out/mapaction/cmf_zipped
-	tools/zip_cmf_json.bat data/out/mapaction/datasets/$(geoextent) data/out/mapaction/cmf_zipped/$@_json.zip	
-	tools/zip_cmf_shp.bat  data/out/mapaction/datasets/$(geoextent) data/out/mapaction/cmf_zipped/$@_shp.zip
-	zOsm2GeoJSON/writeCKANjson.py "data/out/mapaction/cmf_zipped/$@"
-	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/cmf_zipped/$@_json.zip s3://mekillot-backet/cmfs/$@_json.zip
-	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/cmf_zipped/$@_shp.zip  s3://mekillot-backet/cmfs/$@_shp.zip	
-	tools/update_ckan.bat data/out/mapaction/cmf_zipped/$@.CKAN.json
-	touch data/vtargets/$(@F)
-	status.py target "$@" "completed" 
+
+$(geoextent)_cmf: $(geoextent)_osm_datasets $(geoextent)_non_osm_datasets 
+	echo geoextent $(geoextent)   
+	$(call generate_cmf)
 
 
 #=================================================================================================
