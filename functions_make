@@ -19,7 +19,7 @@ define generate_dataset_from_osm
 	zip -j data/out/mapaction/zipped/$@.shp.zip data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shp data/out/mapaction/datasets/$(geoextent)/$(1)/$@.prj data/out/mapaction/datasets/$(geoextent)/$(1)/$@.dbf data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shx data/out/mapaction/datasets/$(geoextent)/$(1)/$@.cpg
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/zipped/$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/zipped/$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
-	tools/update_ckan.bat data/out/mapaction/datasets/$(geoextent)/$(1)/$@.CKAN.json
+	tools/update_ckan.sh data/out/mapaction/datasets/$(geoextent)/$(1)/$@.CKAN.json
 	touch data/vtargets/$(@F)   
 	echo $@ completed
 	python3 status.py target "$@" "completed"	
@@ -38,7 +38,7 @@ define generate_dataset_from_shp
 	python3 zOsm2GeoJSON/writeCKANjson.py "data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json"
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/zipped/$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/zipped/$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
-	tools/update_ckan.bat data/out/mapaction/datasets/$(geoextent)/$(1)/$@.CKAN.json
+	tools/update_ckan.sh data/out/mapaction/datasets/$(geoextent)/$(1)/$@.CKAN.json
 	python3 status.py target "$@" "completed" 
 	touch data/vtargets/$(@F)
 endef
@@ -51,12 +51,12 @@ define generate_dataset_from_csv
 	mkdir -p data/out/mapaction/datasets/$(geoextent)/$(1)
 	ogr2ogr -s_srs EPSG:4326 -t_srs EPSG:3857 -oo X_POSSIBLE_NAMES=lon* -oo Y_POSSIBLE_NAMES=lat* -lco ENCODING=UTF8 -clipsrc static_data/mapaction_poly_files/$(geoextent).json  -f "ESRI Shapefile" data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shp $<
 	ogr2ogr -skipfailures data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shp
-	zOsm2GeoJSON/writeCKANjson.py "data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json"
+	python3 zOsm2GeoJSON/writeCKANjson.py "data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json"
 	zip -j data/out/mapaction/zipped/$@.json.zip data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json
 	zip -j data/out/mapaction/zipped/$@.shp.zip data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shp data/out/mapaction/datasets/$(geoextent)/$(1)/$@.prj data/out/mapaction/datasets/$(geoextent)/$(1)/$@.dbf data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shx data/out/mapaction/datasets/$(geoextent)/$(1)/$@.cpg
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/zipped/$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/zipped/$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
-	tools/update_ckan.bat data/out/mapaction/datasets/$(geoextent)/$(1)/$@.CKAN.json
+	tools/update_ckan.sh data/out/mapaction/datasets/$(geoextent)/$(1)/$@.CKAN.json
 	python3 status.py target "$@" "completed" 
 	touch data/vtargets/$(@F)
 endef
@@ -64,16 +64,21 @@ endef
 # Generate_cmf
 # No parameters
 # $(geoextent) -- global variable
+
+#zip -r data/out/mapaction/cmf_zipped/$@_json.zip data/out/mapaction/datasets/$(geoextent) -x '*.CKAN.json'
 define generate_cmf
 	python3 status.py target "$@" "started" "$<"
 	python3 zOsm2GeoJSON/completness_test.py "$(geoextent)" "data/out/mapaction/datasets/$(geoextent)"
 	mkdir -p data/out/mapaction/cmf_zipped
-	tools/zip_cmf_json.bat data/out/mapaction/datasets/$(geoextent) data/out/mapaction/cmf_zipped/$@_json.zip	
-	tools/zip_cmf_shp.bat  data/out/mapaction/datasets/$(geoextent) data/out/mapaction/cmf_zipped/$@_shp.zip
+	rm -f data/out/mapaction/cmf_zipped/$@_json.zip
+	rm -f data/out/mapaction/cmf_zipped/$@_shp.zip
+	find data/out/mapaction/datasets/$(geoextent) -type f \( -name '*.json' ! -name '*.CKAN.json' \)  | zip -r data/out/mapaction/cmf_zipped/$@_json.zip -@
+	find data/out/mapaction/datasets/$(geoextent) -type f \( -name '*.shp' -o -name '*.shx' -o -name '*.dbf' -o -name '*.prj' -o -name '*.cpg' \)  | zip -r data/out/mapaction/cmf_zipped/$@_shp.zip -@
+	
 	python3 zOsm2GeoJSON/writeCKANjson.py "data/out/mapaction/cmf_zipped/$@"
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/cmf_zipped/$@_json.zip s3://mekillot-backet/cmfs/$@_json.zip
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/cmf_zipped/$@_shp.zip  s3://mekillot-backet/cmfs/$@_shp.zip	
-	tools/update_ckan.bat data/out/mapaction/cmf_zipped/$@.CKAN.json
+	tools/update_ckan.sh data/out/mapaction/cmf_zipped/$@.CKAN.json
 	touch data/vtargets/$(@F)
 	python3 status.py target "$@" "completed" 
 

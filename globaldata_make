@@ -16,25 +16,30 @@ planet-latest.osm.pbf:
 	touch data/in/planet.osm/$(@F)
 
 data/in/mapaction/per_country_pbf:
-	mkdir data/in/mapaction/per_country_pbf
+	mkdir -p data/in/mapaction/per_country_pbf
 
 #-------------------------------------------------------------------------------------------------
 # Natural Earth
 #-------------------------------------------------------------------------------------------------
 data/in/mapaction/natural_earth/ne_10m_lakes:  data/in/mapaction/zipped/ne_10m_lakes.zip
-	unzip "$<" "$@"
+	mkdir -p data/in/mapaction/natural_earth/ne_10m_lakes
+	unzip "$<" -d "$@"
 
 data/in/mapaction/natural_earth/ne_10m_rivers_lake_centerlines : data/in/mapaction/zipped/ne_10m_rivers_lake_centerlines.zip
-	unzip "$<" "$@"
+	mkdir -p data/in/mapaction/natural_earth/ne_10m_rivers_lake_centerlines
+	unzip "$<" -d "$@"
 
 data/in/mapaction/natural_earth/ne_10m_coastline : data/in/mapaction/zipped/ne_10m_coastline.zip 
-	unzip "$<" "$@"
+	mkdir -p data/in/mapaction/natural_earth/ne_10m_coastline
+	unzip "$<" -d "$@"
 
 data/in/mapaction/natural_earth/ne_10m_roads: data/in/mapaction/zipped/ne_10m_roads.zip
-	unzip "$<" "$@"
+	mkdir -p data/in/mapaction/natural_earth/ne_10m_roads
+	unzip "$<" -d "$@"
 
 data/in/mapaction/natural_earth/ne_10m_populated_places : data/in/mapaction/zipped/ne_10m_populated_places.zip
-	unzip "$<" "$@"
+	mkdir -p data/in/mapaction/natural_earth/ne_10m_populated_places
+	unzip "$<" -d "$@"
 
 data/in/mapaction/zipped/ne_10m_rivers_lake_centerlines.zip: |data/in/mapaction/zipped
 	curl "https://naciscdn.org/naturalearth/10m/physical/ne_10m_rivers_lake_centerlines.zip" -o "$@"
@@ -55,7 +60,7 @@ data/in/mapaction/zipped/ne_10m_lakes.zip: |data/in/mapaction/zipped
 # Our Airports
 #-------------------------------------------------------------------------------------------------
 data/in/mapaction/ourairports/airports.csv:
-	if not exist "data/in/mapaction/ourairports" then mkdir "data/in/mapaction/ourairports/" fi
+	mkdir -p data/in/mapaction/ourairports
 	curl "https://davidmegginson.github.io/ourairports-data/airports.csv" -o "$@"
 
 
@@ -64,7 +69,7 @@ data/in/mapaction/ourairports/airports.csv:
 #-------------------------------------------------------------------------------------------------
 
 data/in/mapaction/worldports/UpdatedPub150.csv: 
-	if not exist "data/in/mapaction/worldports" then mkdir "data/in/mapaction/worldports/" fi
+	mkdir -p data/in/mapaction/worldports
 	curl "https://msi.nga.mil/api/publications/download?type=view&key=16920959/SFH00000/UpdatedPub150.csv" -o "$@"
 
 #-------------------------------------------------------------------------------------------------
@@ -72,7 +77,8 @@ data/in/mapaction/worldports/UpdatedPub150.csv:
 #-------------------------------------------------------------------------------------------------
 
 data/in/mapaction/WFP/wld_trs_railways_wfp : data/in/mapaction/zipped/wld_trs_railways_wfp.zip
-	unzip "$<" "$@"
+	mkdir -p data/in/mapaction/WFP
+	unzip "$<" -d "$@"
 
 data/in/mapaction/zipped/wld_trs_railways_wfp.zip: |data/in/mapaction/zipped
 	curl "https://geonode.wfp.org/geoserver/wfs?format_options=charset%3AUTF-8&typename=geonode%3Awld_trs_railways_wfp&outputFormat=SHAPE-ZIP&version=1.0.0&service=WFS&request=GetFeature" -o "$@"
@@ -82,7 +88,8 @@ data/in/mapaction/zipped/wld_trs_railways_wfp.zip: |data/in/mapaction/zipped
 #-------------------------------------------------------------------------------------------------
 
 data/in/mapaction/gppd/global_power_plant_database.csv: data/in/mapaction/zipped/global_power_plant_database_v_1_3.zip
-	unzip "$<" "$(@D)"
+	mkdir -p data/in/mapaction/gppd
+	unzip "$<" -d "$(@D)"
 	touch "$@"
 
 data/in/mapaction/zipped/global_power_plant_database_v_1_3.zip: |data/in/mapaction/zipped

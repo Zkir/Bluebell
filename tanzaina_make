@@ -13,7 +13,6 @@ $(geoextent)_cmf: $(geoextent)_osm_datasets $(geoextent)_non_osm_datasets
 #=================================================================================================
 $(geoextent)_osm_datasets: \
             $(geoextent)_tran_rds_ln_s4_osm_pp_mainroads \
-            $(geoextent)_tran_rds_ln_s4_osm_pp_roads \
             $(geoextent)_tran_rrd_ln_s4_osm_pp_railways \
             $(geoextent)_tran_rrd_ln_s4_osm_pp_subwaytram \
             $(geoextent)_phys_dam_pt_s4_osm_pp_dam \
@@ -51,6 +50,7 @@ $(geoextent)_osm_datasets: \
             $(geoextent)_admn_ad1_py_s4_osm_pp_adminboundary1 \
             $(geoextent)_admn_ad2_py_s4_osm_pp_adminboundary2 \
             $(geoextent)_admn_ad3_py_s4_osm_pp_adminboundary3 \
+#            $(geoextent)_tran_rds_ln_s4_osm_pp_roads 
 #            $(geoextent)_bldg_bdg_py_s4_osm_pp_buildings
 	echo OSM layers completed OK
 	touch data\vtargets\$(@F)
@@ -256,7 +256,6 @@ $(geoextent)_admn_ad3_py_s4_osm_pp_adminboundary3: $(geoextent).o5m
 #=================================================================================================
 
 $(geoextent).o5m: planet-latest.osm.pbf | data/in/mapaction/per_country_pbf
-	echo $@
 	$(call extract_country_pbf)
 
 #=================================================================================================
