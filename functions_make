@@ -2,6 +2,10 @@
 # Definitions of operations
 #=================================================================================================
 # Generate dataset (json+shp) from OSM file
+# Parameters:
+#  $(1) = folder name
+#  $(2) = filter
+#  $(3) = action
 define generate_dataset_from_osm
 	python3 status.py target "$@" "started" "$<"
 	mkdir -p data/out/mapaction/datasets/$(geoextent)/$(1)
@@ -11,8 +15,8 @@ define generate_dataset_from_osm
 	osmfilter data/in/mapaction/per_country_pbf/$(geoextent).o5m $(2) -o=data/mid/interim_osm/$@.osm
 	python3 zOsm2GeoJSON/zOsm2GeoJSON.py data/mid/interim_osm/$@.osm data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json --action=$(3) $(2)
 	ogr2ogr  -lco ENCODING=UTF8 -skipfailures data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shp data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json
-	tools/zip_json.bat data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json data/out/mapaction/zipped/$@.json.zip
-	tools/zip_shp.bat  data/out/mapaction/datasets/$(geoextent)/$(1)/$@      data/out/mapaction/zipped/$@.shp.zip
+	zip -j data/out/mapaction/zipped/$@.json.zip data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json
+	zip -j data/out/mapaction/zipped/$@.shp.zip data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shp data/out/mapaction/datasets/$(geoextent)/$(1)/$@.prj data/out/mapaction/datasets/$(geoextent)/$(1)/$@.dbf data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shx data/out/mapaction/datasets/$(geoextent)/$(1)/$@.cpg
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/zipped/$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/zipped/$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
 	tools/update_ckan.bat data/out/mapaction/datasets/$(geoextent)/$(1)/$@.CKAN.json
@@ -22,13 +26,15 @@ define generate_dataset_from_osm
 endef
 
 # Generate dataset (json+shp) from SHP file, + clipping
+# Parameters:
+#  $(1) = folder name
 define generate_dataset_from_shp
 	python3 status.py target "$@" "started" "$<"
 	mkdir -p data/out/mapaction/datasets/$(geoextent)/$(1)
 	ogr2ogr -clipsrc static_data/mapaction_poly_files/$(geoextent).json -lco ENCODING=UTF8 -skipfailures data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shp $</$(<F).shp
 	ogr2ogr -skipfailures data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shp
-	tools/zip_json.bat data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json data/out/mapaction/zipped/$@.json.zip
-	tools/zip_shp.bat  data/out/mapaction/datasets/$(geoextent)/$(1)/$@      data/out/mapaction/zipped/$@.shp.zip
+	zip -j data/out/mapaction/zipped/$@.json.zip data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json
+	zip -j data/out/mapaction/zipped/$@.shp.zip data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shp data/out/mapaction/datasets/$(geoextent)/$(1)/$@.prj data/out/mapaction/datasets/$(geoextent)/$(1)/$@.dbf data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shx data/out/mapaction/datasets/$(geoextent)/$(1)/$@.cpg
 	python3 zOsm2GeoJSON/writeCKANjson.py "data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json"
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/zipped/$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/zipped/$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
@@ -38,14 +44,16 @@ define generate_dataset_from_shp
 endef
 
 # Generate dataset (json+shp) from CSV file, + clipping
+# Parameters:
+#  $(1) = folder name
 define generate_dataset_from_csv
 	python3 status.py target "$@" "started" "$<"
 	mkdir -p data/out/mapaction/datasets/$(geoextent)/$(1)
 	ogr2ogr -s_srs EPSG:4326 -t_srs EPSG:3857 -oo X_POSSIBLE_NAMES=lon* -oo Y_POSSIBLE_NAMES=lat* -lco ENCODING=UTF8 -clipsrc static_data/mapaction_poly_files/$(geoextent).json  -f "ESRI Shapefile" data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shp $<
 	ogr2ogr -skipfailures data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shp
 	zOsm2GeoJSON/writeCKANjson.py "data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json"
-	tools/zip_json.bat data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json data/out/mapaction/zipped/$@.json.zip
-	tools/zip_shp.bat  data/out/mapaction/datasets/$(geoextent)/$(1)/$@      data/out/mapaction/zipped/$@.shp.zip
+	zip -j data/out/mapaction/zipped/$@.json.zip data/out/mapaction/datasets/$(geoextent)/$(1)/$@.json
+	zip -j data/out/mapaction/zipped/$@.shp.zip data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shp data/out/mapaction/datasets/$(geoextent)/$(1)/$@.prj data/out/mapaction/datasets/$(geoextent)/$(1)/$@.dbf data/out/mapaction/datasets/$(geoextent)/$(1)/$@.shx data/out/mapaction/datasets/$(geoextent)/$(1)/$@.cpg
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/zipped/$@.json.zip s3://mekillot-backet/datasets/$@.json.zip
 	aws --endpoint-url=https://storage.yandexcloud.net s3 cp data/out/mapaction/zipped/$@.shp.zip  s3://mekillot-backet/datasets/$@.shp.zip
 	tools/update_ckan.bat data/out/mapaction/datasets/$(geoextent)/$(1)/$@.CKAN.json
