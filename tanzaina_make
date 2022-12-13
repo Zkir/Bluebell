@@ -256,9 +256,8 @@ $(geoextent)_admn_ad3_py_s4_osm_pp_adminboundary3: $(geoextent).o5m
 #=================================================================================================
 
 $(geoextent).o5m: planet-latest.osm.pbf | data/in/mapaction/per_country_pbf
-	osmium extract -s smart -p static_data/mapaction_poly_files/$(geoextent).poly data/in/planet.osm/planet-latest.osm.pbf -o data/in/mapaction/per_country_pbf/$(geoextent).pbf --overwrite
-	osmconvert data/in/mapaction/per_country_pbf/$(geoextent).pbf -o=data/in/mapaction/per_country_pbf/$(geoextent).o5m
-
+	echo $@
+	$(call extract_country_pbf)
 
 #=================================================================================================
 #                  Non-osm datasets, from global data
