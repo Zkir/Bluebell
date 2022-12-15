@@ -1,0 +1,7 @@
+#!/bin/bash
+# curl -d @$1 -H "Authorization: XXXXXXXXXXXXXX" -X POST "https://geocint.kontur.io/ckan/api/3/action/package_create"
+# curl -d @$1 -H "Authorization: XXXXXXXXXXXXXX" -X POST "https://geocint.kontur.io/ckan/api/3/action/package_update"
+
+
+
+
